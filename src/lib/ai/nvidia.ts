@@ -4,9 +4,9 @@ const NVIDIA_API_URL = process.env.NVIDIA_BASE_URL || "https://integrate.api.nvi
 
 // ─── Model Constants ─────────────────────────────────────
 export const MODELS = {
-  FAST: "nvidia/llama-3.1-nemotron-70b-instruct",
-  SMART: "nvidia/llama-3.3-70b-instruct",
-  REASONING: "nvidia/deepseek-r1",
+  FAST: "meta/llama-3.1-8b-instruct",
+  SMART: "meta/llama-3.1-70b-instruct",
+  REASONING: "deepseek-ai/deepseek-r1",
   EMBED: "nvidia/nv-embedqa-e5-v5",
 } as const;
 
@@ -89,6 +89,7 @@ export async function getEmbedding(text: string): Promise<number[]> {
       {
         model: MODELS.EMBED,
         input: text,
+        input_type: "query",
         encoding_format: "float",
       },
       {
@@ -123,6 +124,7 @@ export async function getEmbeddings(texts: string[]): Promise<number[][]> {
       {
         model: MODELS.EMBED,
         input: texts,
+        input_type: "query",
         encoding_format: "float",
       },
       {
