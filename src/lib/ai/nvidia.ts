@@ -7,7 +7,7 @@ export const MODELS = {
   FAST: "nvidia/llama-3.1-nemotron-70b-instruct",
   SMART: "nvidia/llama-3.3-70b-instruct",
   REASONING: "nvidia/deepseek-r1",
-  EMBED: "nvidia/nv-embed-qa-4",
+  EMBED: "nvidia/nv-embedqa-e5-v5",
 } as const;
 
 export type ModelName = (typeof MODELS)[keyof typeof MODELS];
