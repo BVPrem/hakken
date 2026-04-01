@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "DOTENV_CONFIG_PATH=.env.local npx tsx -r dotenv/config src/lib/db/seed-series.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",

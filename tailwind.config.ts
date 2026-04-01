@@ -11,25 +11,49 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0a0a0f",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         surface: "#111118",
         surfaceHigh: "#1a1a24",
-        border: "#2a2a3a",
+        border: "hsl(var(--border))",
         primary: {
-          DEFAULT: "#6d28d9",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
           light: "#818cf8",
           dark: "#4c1d95",
         },
         accent: {
-          DEFAULT: "#818cf8",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
           pink: "#ec4899",
           cyan: "#22d3ee",
         },
-        text: {
-          primary: "#f1f5f9",
-          secondary: "#94a3b8",
-          muted: "#475569",
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        // Custom Hakken tokens
+        "text-primary": "#f1f5f9",
+        "text-secondary": "#94a3b8",
+        "text-muted": "#475569",
       },
       fontFamily: {
         sans: ["Geist", "sans-serif"],

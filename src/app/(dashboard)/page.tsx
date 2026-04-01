@@ -1,80 +1,114 @@
 import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
+import { db } from "@/lib/db";
+import { series } from "@/lib/db/schema";
+import { desc } from "drizzle-orm";
+import { SeriesCard } from "@/components/series/series-card";
+import { ArrowRight } from "lucide-react";
 
 export default async function HomePage() {
   const user = await currentUser();
 
+  const trendingSeries = await db
+    .select()
+    .from(series)
+    .orderBy(desc(series.popularity))
+    .limit(12);
+
   return (
-    <div className="flex flex-col gap-8">
-      {/* Header */}
+    <div className="flex flex-col gap-10">
+      {/* Welcome */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-heading font-bold text-text-primary">
-          Welcome back{user?.firstName ? `, ${user.firstName}` : ""}
-          <span className="gradient-text"> 👋</span>
+        <h1 className="text-3xl font-heading font-bold text-foreground">
+          Welcome back
+          {user?.firstName ? `, ${user.firstName}` : ""}
+          <span className="gradient-text"> </span>
         </h1>
-        <p className="text-text-secondary">
-          Your anime & manga intelligence hub. Let&apos;s see what&apos;s happening.
+        <p className="text-muted-foreground">
+          Your anime & manga intelligence hub.
         </p>
       </div>
 
-      {/* Placeholder cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3
-        gap-4">
-        {[
-          {
-            title: "Sentiment Pulse",
-            desc: "Community mood on airing shows",
-            soon: true,
-          },
-          {
-            title: "Your Feed",
-            desc: "News tailored to your taste",
-            soon: true,
-          },
-          {
-            title: "Hype Radar",
-            desc: "What's trending right now",
-            soon: true,
-          },
-          {
-            title: "Release Calendar",
-            desc: "Upcoming episodes & chapters",
-            soon: true,
-          },
-          {
-            title: "Hakken AI",
-            desc: "Ask anything about anime",
-            soon: true,
-          },
-          {
-            title: "Friend Activity",
-            desc: "What your friends are watching",
-            soon: true,
-          },
-        ].map((card) => (
-          <div
-            key={card.title}
-            className="glass rounded-xl p-6 flex flex-col gap-2
-              border border-border hover:border-primary/30
-              transition-colors group"
+      {/* Trending section */}
+      <section className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-heading font-semibold text-foreground">
+            Trending Now
+          </h2>
+          <Link
+            href="/discover"
+            className="flex items-center gap-1 text-sm
+              text-accent hover:text-primary transition-colors"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="font-heading font-semibold
-                text-text-primary group-hover:text-accent
-                transition-colors">
+            See all
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {trendingSeries.length > 0 ? (
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3
+              md:grid-cols-4 lg:grid-cols-6 gap-4"
+          >
+            {trendingSeries.map((s, i) => (
+              <SeriesCard
+                key={s.id}
+                id={s.id}
+                externalId={s.externalId}
+                title={s.titleEn ?? s.titleRomaji}
+                coverImage={s.coverImage}
+                type={s.type}
+                status={s.status}
+                score={s.averageScore}
+                genres={s.genres ?? []}
+                year={s.seasonYear}
+                index={i}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            className="glass rounded-xl p-8 text-center
+              border border-border"
+          >
+            <p className="text-muted-foreground">
+              No series data yet.{" "}
+              <Link href="/search" className="text-accent hover:underline">
+                Search to explore
+              </Link>
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* Coming soon features */}
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xl font-heading font-semibold text-foreground">
+          Coming Soon
+        </h2>
+        <div
+          className="grid grid-cols-1 md:grid-cols-2
+            lg:grid-cols-3 gap-4"
+        >
+          {[
+            { title: "Sentiment Pulse", desc: "Community mood on airing shows" },
+            { title: "Your Feed", desc: "News tailored to your taste" },
+            { title: "Hakken AI", desc: "Ask anything about anime" },
+          ].map((card) => (
+            <div
+              key={card.title}
+              className="glass rounded-xl p-6 border
+                border-border hover:border-primary/30
+                transition-colors"
+            >
+              <h3 className="font-heading font-semibold text-foreground mb-1">
                 {card.title}
               </h3>
-              {card.soon && (
-                <span className="text-xs px-2 py-0.5 rounded-full
-                  bg-primary/10 text-primary/70 border
-                  border-primary/20">
-                  Coming soon
-                </span>
-              )}
+              <p className="text-sm text-muted-foreground">{card.desc}</p>
             </div>
-            <p className="text-sm text-text-secondary">{card.desc}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
