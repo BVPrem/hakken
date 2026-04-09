@@ -243,18 +243,6 @@ export function getStudio(media: AniListMedia): string | null {
   return media.studios.nodes.find((s) => s.isAnimationStudio)?.name ?? null;
 }
 
-// ─── MAL CDN cover art ────────────────────────────────────
-// MAL CDN provides official licensed cover art
-// Format: https://cdn.myanimelist.net/images/anime/{id}/l.jpg
-export function getMalCoverUrl(malId: number | null): string | null {
-  if (!malId) return null;
-  return `https://cdn.myanimelist.net/images/anime/${malId}l.jpg`;
-}
-
-// Get best available cover — MAL first, AniList fallback
 export function getBestCoverUrl(media: AniListMedia): string | null {
-  if (media.idMal) {
-    return getMalCoverUrl(media.idMal);
-  }
   return media.coverImage.extraLarge ?? media.coverImage.large ?? null;
 }

@@ -4,7 +4,20 @@ import { db } from "@/lib/db";
 import { series } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { SeriesCard } from "@/components/series/series-card";
+import { NewsCard } from "@/components/feed/news-card";
 import { ArrowRight } from "lucide-react";
+
+interface FeedArticle {
+  id: string;
+  title: string;
+  summary: string | null;
+  source: string;
+  sentiment: string | null;
+  sentimentScore: number | null;
+  publishedAt: string | null;
+  imageUrl: string | null;
+  url: string;
+}
 
 export default async function HomePage() {
   const user = await currentUser();
@@ -14,6 +27,20 @@ export default async function HomePage() {
     .from(series)
     .orderBy(desc(series.popularity))
     .limit(12);
+
+  const feedRes = await fetch(
+    `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/feed?limit=6`,
+    { 
+      cache: "no-store",
+      redirect: "manual",
+    }
+  ).catch(() => null);
+  
+  let feedArticles: FeedArticle[] = [];
+  if (feedRes?.ok) {
+    const feedData = await feedRes.json().catch(() => null);
+    feedArticles = (feedData?.articles ?? []) as FeedArticle[];
+  }
 
   return (
     <div className="flex flex-col gap-10">
@@ -80,6 +107,33 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {/* News feed section */}
+      {feedArticles.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-heading font-semibold text-foreground">
+              Latest News
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {feedArticles.map((article: FeedArticle) => (
+              <NewsCard
+                key={article.id}
+                id={article.id}
+                title={article.title}
+                summary={article.summary}
+                source={article.source}
+                sentiment={article.sentiment}
+                sentimentScore={article.sentimentScore}
+                publishedAt={article.publishedAt}
+                imageUrl={article.imageUrl}
+                url={article.url}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Coming soon features */}
       <section className="flex flex-col gap-4">

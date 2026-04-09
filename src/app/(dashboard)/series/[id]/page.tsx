@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { series } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getAniListById, getStudio } from "@/lib/api/anilist";
+import { WatchlistButton } from "@/components/series/watchlist-button";
 import { Badge } from "@/components/ui/badge";
 import {
   Star,
@@ -255,6 +256,11 @@ export default async function SeriesPage({ params }: PageProps) {
                 </span>
               </p>
             )}
+
+            {/* Watchlist Button */}
+            <div className="pt-2">
+              <WatchlistButton seriesId={id} />
+            </div>
 
             {/* Genres */}
             {seriesData.genres && seriesData.genres.length > 0 && (
