@@ -1,31 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* ── LIGHT MODE (default) ─────────────────────────────
+     White paper, black ink, red accent
+     Inspired by manga tankobon volumes               */
   :root {
-    --background: 240 10% 4%;
-    --foreground: 210 40% 95%;
-    --card: 240 10% 7%;
-    --card-foreground: 210 40% 95%;
-    --popover: 240 10% 7%;
-    --popover-foreground: 210 40% 95%;
-    --primary: 263 70% 50%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 240 10% 10%;
-    --secondary-foreground: 210 40% 95%;
-    --muted: 240 10% 13%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 234 89% 74%;
-    --accent-foreground: 210 40% 98%;
+    --background: 0 0% 97%;
+    --foreground: 0 0% 6%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 6%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 6%;
+    --primary: 354 75% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 93%;
+    --secondary-foreground: 0 0% 15%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 354 75% 48%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 240 10% 15%;
-    --input: 240 10% 15%;
-    --ring: 263 70% 50%;
-    --radius: 0.75rem;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
+    --ring: 354 75% 48%;
+    --radius: 0rem;
+  }
+
+  /* ── DARK MODE ────────────────────────────────────────
+     Black ink, white text, red accent
+     Like a manga panel inverted                      */
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 354 75% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 85%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 354 75% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 354 75% 55%;
   }
 }
 
@@ -33,40 +59,31 @@
   * {
     border-color: hsl(var(--border));
   }
-
   body {
-    background-color: #0a0a0f;
-    color: #f1f5f9;
-    font-family: 'Geist', sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans), sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-display), sans-serif;
   }
-
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
-
   ::-webkit-scrollbar-track {
-    background: #0a0a0f;
+    background-color: hsl(var(--background));
   }
-
   ::-webkit-scrollbar-thumb {
-    background: #2a2a3a;
-    border-radius: 3px;
+    background-color: hsl(var(--border));
   }
-
   ::-webkit-scrollbar-thumb:hover {
-    background: #6d28d9;
+    background-color: hsl(var(--primary));
   }
 }
 
 @layer utilities {
-  /* Glassmorphism card effect */
   .glass {
     background: rgba(26, 26, 36, 0.6);
     backdrop-filter: blur(12px);
@@ -74,7 +91,6 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  /* Glow effects */
   .glow-purple {
     box-shadow: 0 0 20px rgba(109, 40, 217, 0.3),
                 0 0 40px rgba(109, 40, 217, 0.1);
@@ -85,12 +101,10 @@
                 0 0 40px rgba(129, 140, 248, 0.1);
   }
 
-  /* Text glow */
   .text-glow {
     text-shadow: 0 0 20px rgba(129, 140, 248, 0.5);
   }
 
-  /* Gradient text */
   .gradient-text {
     -webkit-background-clip: text;
     background-clip: text;
@@ -98,7 +112,6 @@
     background-image: linear-gradient(135deg, #818cf8 0%, #6d28d9 50%, #ec4899 100%);
   }
 
-  /* Shimmer effect for loading states */
   .shimmer {
     background: linear-gradient(
       90deg,
@@ -110,13 +123,58 @@
     animation: shimmer 2s linear infinite;
   }
 
-  /* Cover art overlay */
   .cover-overlay {
     background: linear-gradient(
       to top,
       #0a0a0f 0%,
       rgba(10, 10, 15, 0.8) 40%,
       rgba(10, 10, 15, 0.2) 100%
+    );
+  }
+
+  .manga-panel {
+    border: 2.5px solid hsl(var(--foreground));
+    border-radius: 0;
+  }
+
+  .manga-panel-thin {
+    border: 1.5px solid hsl(var(--border));
+    border-radius: 0;
+  }
+
+  .halftone {
+    background-image: radial-gradient(
+      circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px
+    );
+    background-size: 14px 14px;
+  }
+
+  .chapter-marker {
+    border-left: 4px solid hsl(var(--primary));
+    padding-left: 0.75rem;
+  }
+
+  .panel-hover {
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .panel-hover:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 3px 3px 0 hsl(var(--primary));
+  }
+
+  .ink-text {
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .speed-lines {
+    background: repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg,
+      transparent 10deg,
+      hsl(var(--foreground) / 0.015) 10deg,
+      hsl(var(--foreground) / 0.015) 11deg
     );
   }
 }

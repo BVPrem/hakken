@@ -8,6 +8,7 @@ import { Menu, X, Home, Search, Compass, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
@@ -24,21 +25,18 @@ export function Navbar() {
   return (
     <>
       {/* Top bar — visible on mobile only */}
-      <header className="md:hidden fixed top-0 left-0 right-0 z-50
-        bg-surface/80 backdrop-blur-md border-b border-border
-        px-4 h-14 flex items-center justify-between">
+      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-border px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-heading font-bold
-            gradient-text">
+          <span className="text-xl font-display font-bold ink-text">
             発見
           </span>
-          <span className="text-sm font-heading text-text-secondary
-            tracking-widest uppercase">
+          <span className="text-sm font-sans text-muted-foreground tracking-widest uppercase">
             Hakken
           </span>
         </Link>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <UserButton
             appearance={{
               elements: { avatarBox: "w-7 h-7" },
@@ -47,8 +45,7 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-text-secondary hover:text-text-primary
-              w-8 h-8"
+            className="text-muted-foreground hover:text-foreground w-8 h-8"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? (
@@ -68,9 +65,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden fixed top-14 left-0 right-0 z-40
-              bg-surface border-b border-border px-4 py-4 flex
-              flex-col gap-1"
+            className="md:hidden fixed top-14 left-0 right-0 z-40 bg-card border-b border-border px-4 py-4 flex flex-col gap-1"
           >
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -81,19 +76,17 @@ export function Navbar() {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-none",
                     "text-sm font-medium transition-all",
                     isActive
-                      ? "text-text-primary bg-surfaceHigh \
-                        border border-border"
-                      : "text-text-secondary hover:text-text-primary \
-                        hover:bg-surfaceHigh/50"
+                      ? "text-foreground bg-muted border border-border"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >
                   <Icon
                     className={cn(
                       "w-4 h-4",
-                      isActive ? "text-primary" : "text-text-muted"
+                      isActive ? "text-primary" : "text-muted-foreground"
                     )}
                   />
                   {item.label}

@@ -13,6 +13,11 @@ const config: Config = {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        ink: "#0a0a0a",
+        paper: "#f5f5f0",
+        "manga-red": "#e63946",
+        "manga-gray": "#2a2a2a",
+        "manga-border": "#1a1a1a",
         surface: "#111118",
         surfaceHigh: "#1a1a24",
         border: "hsl(var(--border))",
@@ -50,13 +55,13 @@ const config: Config = {
         },
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        // Custom Hakken tokens
         "text-primary": "#f1f5f9",
         "text-secondary": "#94a3b8",
         "text-muted": "#475569",
       },
       fontFamily: {
-        sans: ["Geist", "sans-serif"],
+        sans: ["var(--font-sans)", "sans-serif"],
+        display: ["var(--font-display)", "sans-serif"],
         heading: ["Space Grotesk", "sans-serif"],
       },
       borderRadius: {
