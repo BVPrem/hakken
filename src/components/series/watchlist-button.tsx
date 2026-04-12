@@ -76,7 +76,7 @@ export function WatchlistButton({ seriesId }: WatchlistButtonProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button variant={status ? "default" : "outline"} className="gap-2" disabled={saving}>
           {saving ? (
             <Loader2 className="w-4 h-4 animate-spin" />
