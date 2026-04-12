@@ -4,24 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  Home,
-  Search,
-  Compass,
-  Users,
-  User,
-  Zap,
-  BookOpen,
+  Home, Search, Compass, Users, User, BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/search", label: "Search", icon: Search },
-  { href: "/discover", label: "Discover", icon: Compass },
-  { href: "/friends", label: "Friends", icon: Users },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/",        label: "Home",    icon: Home    },
+  { href: "/search",  label: "Search",  icon: Search  },
+  { href: "/discover",label: "Discover",icon: Compass },
+  { href: "/friends", label: "Friends", icon: Users   },
+  { href: "/profile", label: "Profile", icon: User    },
 ];
 
 export function Sidebar() {
@@ -31,90 +25,93 @@ export function Sidebar() {
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="hidden md:flex flex-col w-64 min-h-screen bg-card border-r border-border px-4 py-6 fixed left-0 top-0 z-40"
+      transition={{ duration: 0.3 }}
+      className="hidden md:flex flex-col w-60 min-h-screen
+        fixed left-0 top-0 z-40
+        bg-background border-r-2 border-foreground/10"
     >
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-3 px-2 mb-10 group">
+      <Link href="/"
+        className="flex items-center gap-3 px-6 py-6
+          border-b-2 border-foreground/10 group">
         <div className="flex flex-col">
-          <span className="text-2xl font-display font-bold ink-text leading-none">
+          <span className="font-display text-2xl uppercase
+            tracking-widest text-foreground">
             発見
           </span>
-          <span className="text-xs font-sans font-semibold text-muted-foreground tracking-widest uppercase mt-0.5">
+          <span className="font-display text-[10px]
+            uppercase tracking-[0.3em]
+            text-muted-foreground">
             Hakken
           </span>
         </div>
-        <Zap className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Red accent dot */}
+        <div className="w-2 h-2 rounded-full bg-primary
+          ml-auto opacity-0 group-hover:opacity-100
+          transition-opacity" />
       </Link>
 
-      {/* Nav items */}
-      <nav className="flex flex-col gap-1 flex-1">
+      {/* Nav */}
+      <nav className="flex flex-col flex-1 py-4">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
-
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-none",
-                "text-sm font-medium transition-all duration-200",
-                "relative group",
+                "relative flex items-center gap-3",
+                "px-6 py-3 text-sm font-medium",
+                "transition-colors duration-150",
                 isActive
-                  ? "text-foreground bg-muted"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-foreground bg-foreground/5"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
               )}
             >
+              {/* Chapter marker — red left bar on active */}
               {isActive && (
                 <motion.div
-                  layoutId="activeNav"
-                  className="absolute inset-0 bg-muted border border-border manga-panel-thin"
+                  layoutId="activeBar"
+                  className="absolute left-0 top-0 bottom-0
+                    w-[3px] bg-primary"
                   transition={{
                     type: "spring",
-                    stiffness: 380,
-                    damping: 30,
+                    stiffness: 400,
+                    damping: 30
                   }}
                 />
               )}
-              <Icon
-                className={cn(
-                  "w-4 h-4 relative z-10 transition-colors",
-                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-                )}
-              />
-              <span className="relative z-10">{item.label}</span>
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-none" />
-              )}
+              <Icon className={cn(
+                "w-4 h-4",
+                isActive ? "text-primary" : ""
+              )} />
+              <span className={cn(
+                isActive ? "font-display uppercase tracking-wide text-xs" : ""
+              )}>
+                {item.label}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom section */}
-      <div className="flex flex-col gap-4 pt-4 border-t border-border">
-        <Link
-          href="/discover"
-          className="flex items-center gap-2 px-3 py-2 rounded-none text-xs text-muted-foreground hover:text-accent hover:bg-muted/50 transition-all"
-        >
+      {/* Bottom */}
+      <div className="px-6 py-4 border-t-2 border-foreground/10
+        flex flex-col gap-3">
+        <Link href="/discover"
+          className="flex items-center gap-2 text-xs
+            text-muted-foreground hover:text-foreground
+            transition-colors font-display uppercase
+            tracking-wider">
           <BookOpen className="w-3.5 h-3.5" />
-          <span>Manga Releases</span>
+          Releases
         </Link>
-        <ThemeToggle />
-        <div className="flex items-center gap-3 px-2">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "w-8 h-8",
-                userButtonPopoverCard: "bg-card border border-border",
-                userButtonPopoverText: "text-foreground",
-              },
-            }}
-          />
-          <span className="text-sm text-muted-foreground font-medium">
-            My Account
-          </span>
+        <div className="flex items-center justify-between">
+          <UserButton appearance={{
+            elements: { avatarBox: "w-7 h-7" }
+          }} />
+          <ThemeToggle />
         </div>
       </div>
     </motion.aside>

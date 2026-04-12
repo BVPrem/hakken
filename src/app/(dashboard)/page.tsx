@@ -43,40 +43,48 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="flex flex-col gap-10">
-      {/* Welcome */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-heading font-bold text-foreground">
-          Welcome back
-          {user?.firstName ? `, ${user.firstName}` : ""}
-          <span className="gradient-text"> </span>
-        </h1>
-        <p className="text-muted-foreground">
-          Your anime & manga intelligence hub.
-        </p>
+    <div className="flex flex-col gap-12">
+
+      {/* Hero header */}
+      <div className="relative overflow-hidden border-b-2
+        border-foreground/10 pb-8 -mx-4 md:-mx-8 px-4
+        md:px-8 halftone">
+        <div className="relative z-10">
+          <p className="font-display text-xs uppercase
+            tracking-[0.4em] text-primary mb-2">
+            Welcome back
+            {user?.firstName ? `, ${user.firstName}` : ""}
+          </p>
+          <h1 className="font-display text-4xl md:text-6xl
+            uppercase tracking-tight text-foreground
+            leading-none">
+            Your Anime<br />
+            <span className="text-primary">Intelligence</span>
+            <br />Hub
+          </h1>
+        </div>
       </div>
 
-      {/* Trending section */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-heading font-semibold text-foreground">
+      {/* Trending */}
+      <section className="flex flex-col gap-5">
+        <div className="flex items-center justify-between
+          chapter-marker">
+          <h2 className="font-display text-xl uppercase
+            tracking-widest text-foreground">
             Trending Now
           </h2>
-          <Link
-            href="/discover"
-            className="flex items-center gap-1 text-sm
-              text-accent hover:text-primary transition-colors"
-          >
-            See all
-            <ArrowRight className="w-3.5 h-3.5" />
+          <Link href="/discover"
+            className="flex items-center gap-1 text-xs
+              font-display uppercase tracking-wider
+              text-primary hover:text-primary/70
+              transition-colors">
+            All <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
 
         {trendingSeries.length > 0 ? (
-          <div
-            className="grid grid-cols-2 sm:grid-cols-3
-              md:grid-cols-4 lg:grid-cols-6 gap-4"
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3
+            md:grid-cols-4 lg:grid-cols-6 gap-3">
             {trendingSeries.map((s, i) => (
               <SeriesCard
                 key={s.id}
@@ -94,13 +102,11 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <div
-            className="glass rounded-xl p-8 text-center
-              border border-border"
-          >
-            <p className="text-muted-foreground">
-              No series data yet.{" "}
-              <Link href="/search" className="text-accent hover:underline">
+          <div className="manga-panel p-8 text-center">
+            <p className="text-muted-foreground text-sm">
+              No series yet.{" "}
+              <Link href="/search"
+                className="text-primary hover:underline">
                 Search to explore
               </Link>
             </p>
@@ -108,15 +114,18 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* News feed section */}
+      {/* News Feed */}
       {feedArticles.length > 0 && (
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-heading font-semibold text-foreground">
+        <section className="flex flex-col gap-5">
+          <div className="flex items-center justify-between
+            chapter-marker">
+            <h2 className="font-display text-xl uppercase
+              tracking-widest text-foreground">
               Latest News
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2
+            lg:grid-cols-3 gap-3">
             {feedArticles.map((article: FeedArticle) => (
               <NewsCard
                 key={article.id}
@@ -135,30 +144,32 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Coming soon features */}
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-heading font-semibold text-foreground">
-          Coming Soon
-        </h2>
-        <div
-          className="grid grid-cols-1 md:grid-cols-2
-            lg:grid-cols-3 gap-4"
-        >
+      {/* Coming soon */}
+      <section className="flex flex-col gap-5">
+        <div className="chapter-marker">
+          <h2 className="font-display text-xl uppercase
+            tracking-widest text-foreground">
+            Coming Soon
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[
-            { title: "Sentiment Pulse", desc: "Community mood on airing shows" },
-            { title: "Your Feed", desc: "News tailored to your taste" },
-            { title: "Hakken AI", desc: "Ask anything about anime" },
+            { title: "Sentiment Pulse",
+              desc: "Community mood tracking per episode" },
+            { title: "Hakken AI",
+              desc: "Ask anything about anime & manga" },
+            { title: "Friend Matching",
+              desc: "Find what to watch together" },
           ].map((card) => (
-            <div
-              key={card.title}
-              className="glass rounded-xl p-6 border
-                border-border hover:border-primary/30
-                transition-colors"
-            >
-              <h3 className="font-heading font-semibold text-foreground mb-1">
+            <div key={card.title}
+              className="manga-panel-thin p-5 bg-card">
+              <h3 className="font-display text-sm uppercase
+                tracking-wider text-foreground mb-1">
                 {card.title}
               </h3>
-              <p className="text-sm text-muted-foreground">{card.desc}</p>
+              <p className="text-xs text-muted-foreground">
+                {card.desc}
+              </p>
             </div>
           ))}
         </div>

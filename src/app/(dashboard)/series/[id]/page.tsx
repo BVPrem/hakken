@@ -109,7 +109,8 @@ export default async function SeriesPage({ params }: PageProps) {
   return (
     <div className="flex flex-col gap-8 -mt-8 -mx-4 md:-mx-8">
       {/* Hero Banner */}
-      <div className="relative w-full h-64 md:h-80 overflow-hidden">
+      <div className="relative w-full h-56 md:h-72 overflow-hidden
+        border-b-2 border-foreground/10">
         {seriesData.bannerImage ? (
           <Image
             src={seriesData.bannerImage}
@@ -119,12 +120,10 @@ export default async function SeriesPage({ params }: PageProps) {
             priority
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/10" />
+          <div className="w-full h-full halftone bg-muted" />
         )}
-        <div
-          className="absolute inset-0 bg-gradient-to-t
-            from-background via-background/60 to-transparent"
-        />
+        <div className="absolute inset-0 bg-gradient-to-t
+          from-background via-background/50 to-transparent" />
       </div>
 
       {/* Content */}

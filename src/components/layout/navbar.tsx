@@ -4,68 +4,69 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, Search, Compass, Users, User } from "lucide-react";
+import { Menu, X, Home, Search, Compass, Users, User }
+  from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/search", label: "Search", icon: Search },
-  { href: "/discover", label: "Discover", icon: Compass },
-  { href: "/friends", label: "Friends", icon: Users },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/",         label: "Home",    icon: Home    },
+  { href: "/search",   label: "Search",  icon: Search  },
+  { href: "/discover", label: "Discover",icon: Compass },
+  { href: "/friends",  label: "Friends", icon: Users   },
+  { href: "/profile",  label: "Profile", icon: User    },
 ];
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   return (
     <>
-      {/* Top bar — visible on mobile only */}
-      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-border px-4 h-14 flex items-center justify-between">
+      <header className="md:hidden fixed top-0 left-0 right-0
+        z-50 bg-background border-b-2 border-foreground/10
+        px-4 h-14 flex items-center justify-between">
+
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-display font-bold ink-text">
+          <span className="font-display text-xl uppercase
+            tracking-widest text-foreground">
             発見
           </span>
-          <span className="text-sm font-sans text-muted-foreground tracking-widest uppercase">
+          <span className="font-display text-[9px] uppercase
+            tracking-[0.3em] text-muted-foreground">
             Hakken
           </span>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <ThemeToggle />
-          <UserButton
-            appearance={{
-              elements: { avatarBox: "w-7 h-7" },
-            }}
-          />
+          <UserButton appearance={{
+            elements: { avatarBox: "w-7 h-7" }
+          }} />
           <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:text-foreground w-8 h-8"
-            onClick={() => setIsOpen(!isOpen)}
+            variant="ghost" size="icon"
+            className="w-8 h-8"
+            onClick={() => setOpen(!open)}
           >
-            {isOpen ? (
-              <X className="w-4 h-4" />
-            ) : (
-              <Menu className="w-4 h-4" />
-            )}
+            {open
+              ? <X className="w-4 h-4" />
+              : <Menu className="w-4 h-4" />}
           </Button>
         </div>
       </header>
 
-      {/* Mobile menu overlay */}
       <AnimatePresence>
-        {isOpen && (
+        {open && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden fixed top-14 left-0 right-0 z-40 bg-card border-b border-border px-4 py-4 flex flex-col gap-1"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+            className="md:hidden fixed top-14 left-0 right-0
+              z-40 bg-background border-b-2
+              border-foreground/10"
           >
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -74,22 +75,27 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-none",
-                    "text-sm font-medium transition-all",
+                    "flex items-center gap-3 px-4 py-3",
+                    "border-b border-foreground/5",
+                    "text-sm transition-colors",
                     isActive
-                      ? "text-foreground bg-muted border border-border"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "text-foreground border-l-4 border-l-primary pl-3"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "w-4 h-4",
-                      isActive ? "text-primary" : "text-muted-foreground"
-                    )}
-                  />
-                  {item.label}
+                  <Icon className={cn(
+                    "w-4 h-4",
+                    isActive ? "text-primary" : ""
+                  )} />
+                  <span className={cn(
+                    isActive
+                      ? "font-display uppercase tracking-wide text-xs"
+                      : "font-medium text-sm"
+                  )}>
+                    {item.label}
+                  </span>
                 </Link>
               );
             })}
