@@ -1,180 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* ── LIGHT MODE (default) ─────────────────────────────
-     White paper, black ink, red accent
-     Inspired by manga tankobon volumes               */
   :root {
-    --background: 0 0% 97%;
-    --foreground: 0 0% 6%;
+    --background: 40 15% 96%;
+    --foreground: 0 0% 8%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 6%;
+    --card-foreground: 0 0% 8%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 6%;
-    --primary: 354 75% 48%;
+    --popover-foreground: 0 0% 8%;
+    --primary: 354 74% 48%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 93%;
-    --secondary-foreground: 0 0% 15%;
-    --muted: 0 0% 93%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 354 75% 48%;
+    --secondary: 40 10% 92%;
+    --secondary-foreground: 0 0% 20%;
+    --muted: 40 10% 90%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 354 74% 48%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 82%;
-    --input: 0 0% 82%;
-    --ring: 354 75% 48%;
+    --border: 0 0% 84%;
+    --input: 0 0% 84%;
+    --ring: 354 74% 48%;
     --radius: 0rem;
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(0, 0, 0, 0.08);
   }
 
-  /* ── DARK MODE ────────────────────────────────────────
-     Black ink, white text, red accent
-     Like a manga panel inverted                      */
   .dark {
     --background: 0 0% 5%;
-    --foreground: 0 0% 95%;
+    --foreground: 40 15% 94%;
     --card: 0 0% 8%;
-    --card-foreground: 0 0% 95%;
+    --card-foreground: 40 15% 94%;
     --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 354 75% 55%;
+    --popover-foreground: 40 15% 94%;
+    --primary: 354 74% 55%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 13%;
-    --secondary-foreground: 0 0% 85%;
+    --secondary-foreground: 40 10% 85%;
     --muted: 0 0% 13%;
-    --muted-foreground: 0 0% 55%;
-    --accent: 354 75% 55%;
+    --muted-foreground: 0 0% 52%;
+    --accent: 354 74% 55%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 354 75% 55%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 354 74% 55%;
+    --glass-bg: rgba(15, 15, 15, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.06);
   }
 }
 
 @layer base {
-  * {
-    border-color: hsl(var(--border));
-  }
+  * { border-color: hsl(var(--border)); }
+  html { scroll-behavior: smooth; }
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: var(--font-sans), sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display), sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
   }
-  ::-webkit-scrollbar {
-    width: 4px;
-  }
-  ::-webkit-scrollbar-track {
-    background-color: hsl(var(--background));
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--border));
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--primary));
-  }
+  ::-webkit-scrollbar { width: 3px; height: 3px; }
+  ::-webkit-scrollbar-track { background-color: hsl(var(--background)); }
+  ::-webkit-scrollbar-thumb { background-color: hsl(var(--border)); }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary)); }
 }
 
 @layer utilities {
+  /* ── Glass panels ───────────────────────────── */
   .glass {
-    background: rgba(26, 26, 36, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+  }
+  .glass-strong {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
   }
 
-  .glow-purple {
-    box-shadow: 0 0 20px rgba(109, 40, 217, 0.3),
-                0 0 40px rgba(109, 40, 217, 0.1);
-  }
-
-  .glow-indigo {
-    box-shadow: 0 0 20px rgba(129, 140, 248, 0.3),
-                0 0 40px rgba(129, 140, 248, 0.1);
-  }
-
-  .text-glow {
-    text-shadow: 0 0 20px rgba(129, 140, 248, 0.5);
-  }
-
-  .gradient-text {
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    background-image: linear-gradient(135deg, #818cf8 0%, #6d28d9 50%, #ec4899 100%);
-  }
-
-  .shimmer {
-    background: linear-gradient(
-      90deg,
-      #1a1a24 25%,
-      #2a2a3a 50%,
-      #1a1a24 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s linear infinite;
-  }
-
-  .cover-overlay {
-    background: linear-gradient(
-      to top,
-      #0a0a0f 0%,
-      rgba(10, 10, 15, 0.8) 40%,
-      rgba(10, 10, 15, 0.2) 100%
-    );
-  }
-
+  /* ── Manga panel borders ────────────────────── */
   .manga-panel {
-    border: 2.5px solid hsl(var(--foreground));
+    border: 2px solid hsl(var(--foreground) / 0.15);
+    border-radius: 0;
+  }
+  .manga-panel-accent {
+    border: 2px solid hsl(var(--primary));
     border-radius: 0;
   }
 
-  .manga-panel-thin {
-    border: 1.5px solid hsl(var(--border));
-    border-radius: 0;
+  /* ── Chapter marker (red left bar) ─────────── */
+  .chapter-marker {
+    border-left: 3px solid hsl(var(--primary));
+    padding-left: 0.625rem;
   }
 
+  /* ── Halftone background texture ───────────── */
   .halftone {
     background-image: radial-gradient(
-      circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px
+      circle,
+      hsl(var(--foreground) / 0.04) 1px,
+      transparent 1px
     );
-    background-size: 14px 14px;
+    background-size: 16px 16px;
   }
 
-  .chapter-marker {
-    border-left: 4px solid hsl(var(--primary));
-    padding-left: 0.75rem;
-  }
-
-  .panel-hover {
+  /* ── Panel hover — comic book lift ─────────── */
+  .panel-lift {
     transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
   }
-  .panel-hover:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: 3px 3px 0 hsl(var(--primary));
+  .panel-lift:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 3px 3px 0px hsl(var(--primary) / 0.6);
   }
 
-  .ink-text {
-    font-family: var(--font-display);
-    letter-spacing: 0.04em;
+  /* ── Display font utility ───────────────────── */
+  .font-display-caps {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  .speed-lines {
-    background: repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      transparent 0deg,
-      transparent 10deg,
-      hsl(var(--foreground) / 0.015) 10deg,
-      hsl(var(--foreground) / 0.015) 11deg
+  /* ── Red glow — used very sparingly ────────── */
+  .glow-red {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.25);
+  }
+
+  /* ── Gradient text ──────────────────────────── */
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--foreground)) 100%
     );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }

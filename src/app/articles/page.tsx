@@ -112,20 +112,20 @@ function relativeTime(date: Date | string): string {
 
 function ArticleSkeleton() {
   return (
-    <div className="rounded-xl bg-card ring-1 ring-foreground/10 overflow-hidden">
-      <Skeleton className="h-44 w-full rounded-none" />
+    <div className="manga-panel bg-card overflow-hidden">
+      <Skeleton className="h-44 w-full" />
       <div className="p-4 space-y-3">
         <div className="flex gap-2">
-          <Skeleton className="h-5 w-24 rounded-full" />
-          <Skeleton className="h-5 w-16 rounded-full" />
+          <Skeleton className="h-5 w-24" />
+          <Skeleton className="h-5 w-16" />
         </div>
         <Skeleton className="h-5 w-full" />
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-2/3" />
         <div className="flex gap-2 pt-1">
-          <Skeleton className="h-4 w-14 rounded-full" />
-          <Skeleton className="h-4 w-14 rounded-full" />
+          <Skeleton className="h-4 w-14" />
+          <Skeleton className="h-4 w-14" />
         </div>
       </div>
     </div>
@@ -143,9 +143,9 @@ function ArticleCard({ article }: { article: Article }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="group block rounded-xl bg-card ring-1 ring-foreground/10
-        hover:ring-primary/40 hover:shadow-lg hover:shadow-primary/5
-        transition-all duration-300 overflow-hidden"
+      className="group block manga-panel bg-card
+        hover:border-primary/40
+        transition-all duration-300 overflow-hidden panel-lift"
     >
       {/* Cover image */}
       {article.imageUrl ? (
@@ -160,7 +160,7 @@ function ArticleCard({ article }: { article: Article }) {
           <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
           <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2">
             <span className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium border backdrop-blur-sm",
+              "inline-flex items-center gap-1 px-2 py-0.5 text-xs font-display uppercase tracking-wide border backdrop-blur-sm",
               sourceColor(article.source)
             )}>
               {formatSourceName(article.source)}
@@ -168,8 +168,8 @@ function ArticleCard({ article }: { article: Article }) {
           </div>
         </div>
       ) : (
-        <div className="h-44 flex items-center justify-center bg-gradient-to-br from-surfaceHigh to-surface">
-          <Newspaper className="w-10 h-10 text-text-muted" />
+        <div className="h-44 flex items-center justify-center bg-muted">
+          <Newspaper className="w-10 h-10 text-muted-foreground" />
         </div>
       )}
 
@@ -179,7 +179,7 @@ function ArticleCard({ article }: { article: Article }) {
         <div className="flex items-center gap-2 flex-wrap">
           {!article.imageUrl && (
             <span className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium border",
+              "inline-flex items-center gap-1 px-2 py-0.5 text-xs font-display uppercase tracking-wide border",
               sourceColor(article.source)
             )}>
               {formatSourceName(article.source)}
@@ -189,22 +189,22 @@ function ArticleCard({ article }: { article: Article }) {
         </div>
 
         {/* Title */}
-        <h3 className="font-heading text-base font-semibold leading-snug
-          text-text-primary line-clamp-2 group-hover:text-primary
-          transition-colors">
+        <h3 className="font-display text-sm font-semibold leading-snug
+          text-foreground line-clamp-2 group-hover:text-primary
+          transition-colors uppercase tracking-wide">
           {article.title}
         </h3>
 
         {/* Summary / content snippet */}
         {(article.summary || article.content) && (
-          <p className="text-sm text-text-secondary line-clamp-3 leading-relaxed">
+          <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
             {article.summary ?? article.content?.slice(0, 200)}
           </p>
         )}
 
         {/* Footer: time + tags */}
-        <div className="flex items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-1.5 text-xs text-text-muted">
+        <div className="flex items-center justify-between gap-3 pt-1 border-t border-border">
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
             <Clock className="w-3 h-3" />
             {article.publishedAt
               ? relativeTime(article.publishedAt)
@@ -212,7 +212,7 @@ function ArticleCard({ article }: { article: Article }) {
           </div>
 
           {article.url && (
-            <ExternalLink className="w-3.5 h-3.5 text-text-muted
+            <ExternalLink className="w-3.5 h-3.5 text-muted-foreground
               group-hover:text-primary transition-colors" />
           )}
         </div>
@@ -223,16 +223,14 @@ function ArticleCard({ article }: { article: Article }) {
             {article.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 rounded-full
-                  bg-surfaceHigh px-2 py-0.5 text-xs text-text-secondary
-                  border border-border"
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-display uppercase tracking-wide bg-muted text-muted-foreground border border-border"
               >
                 <Tag className="w-2.5 h-2.5" />
                 {tag}
               </span>
             ))}
             {article.tags.length > 3 && (
-              <span className="text-xs text-text-muted self-center">
+              <span className="text-[10px] text-muted-foreground self-center">
                 +{article.tags.length - 3}
               </span>
             )}
@@ -335,22 +333,21 @@ function ArticlesContent() {
 
   // ─── Render ───────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen halftone">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl
-        border-b border-border">
+      <div className="sticky top-0 z-30 glass border-b-2 border-foreground/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center
-                justify-center">
+              <div className="w-10 h-10 bg-primary/10 flex items-center
+                justify-center manga-panel-accent">
                 <Newspaper className="w-5 h-5 text-primary" />
               </div>
-              <div>
-                <h1 className="text-xl font-heading font-bold text-text-primary">
+              <div className="chapter-marker">
+                <h1 className="font-display text-xl uppercase tracking-wider text-foreground">
                   Articles
                 </h1>
-                <p className="text-sm text-text-muted">
+                <p className="text-xs text-muted-foreground">
                   {total > 0 ? `${total.toLocaleString()} articles` : "Anime & manga news"}
                 </p>
               </div>
@@ -360,13 +357,13 @@ function ArticlesContent() {
             <form onSubmit={handleSearch} className="flex-1 sm:max-w-md sm:ml-auto">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2
-                  w-4 h-4 text-text-muted" />
+                  w-4 h-4 text-muted-foreground" />
                 <Input
                   type="search"
                   placeholder="Search articles..."
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 bg-card"
                 />
               </div>
             </form>
@@ -376,14 +373,14 @@ function ArticlesContent() {
           {sources.length > 0 && (
             <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-1
               scrollbar-none">
-              <Filter className="w-4 h-4 text-text-muted shrink-0" />
+              <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
               <button
                 onClick={() => handleSourceFilter("")}
                 className={cn(
-                  "shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-colors",
+                  "shrink-0 px-3 py-1 text-xs font-display uppercase tracking-wide border transition-colors",
                   !activeSource
                     ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-transparent text-text-secondary border-border hover:border-primary/40"
+                    : "bg-transparent text-muted-foreground border-border hover:border-primary/40"
                 )}
               >
                 All Sources
@@ -393,10 +390,10 @@ function ArticlesContent() {
                   key={source}
                   onClick={() => handleSourceFilter(source)}
                   className={cn(
-                    "shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-colors",
+                    "shrink-0 px-3 py-1 text-xs font-display uppercase tracking-wide border transition-colors",
                     activeSource === source
                       ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-transparent text-text-secondary border-border hover:border-primary/40"
+                      : "bg-transparent text-muted-foreground border-border hover:border-primary/40"
                   )}
                 >
                   {formatSourceName(source)}
@@ -411,8 +408,8 @@ function ArticlesContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Error state */}
         {error && (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-destructive/10
-            border border-destructive/20 text-destructive mb-6">
+          <div className="flex items-center gap-3 p-4 manga-panel bg-destructive/10
+            border-destructive/20 text-destructive mb-6">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <p className="text-sm">{error}</p>
             <Button
@@ -428,7 +425,7 @@ function ArticlesContent() {
 
         {/* Loading skeleton */}
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {Array.from({ length: 8 }).map((_, i) => (
               <ArticleSkeleton key={i} />
             ))}
@@ -438,14 +435,14 @@ function ArticlesContent() {
         {/* Empty state */}
         {!loading && !error && articles.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-surfaceHigh flex items-center
-              justify-center mb-4">
-              <Newspaper className="w-8 h-8 text-text-muted" />
+            <div className="w-16 h-16 bg-muted flex items-center
+              justify-center mb-4 manga-panel">
+              <Newspaper className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-heading font-semibold text-text-primary mb-2">
+            <h3 className="font-display text-lg uppercase tracking-wider text-foreground mb-2">
               No articles found
             </h3>
-            <p className="text-sm text-text-muted max-w-sm">
+            <p className="text-xs text-muted-foreground max-w-sm">
               {searchQuery
                 ? `No results for "${searchQuery}". Try a different search term.`
                 : activeSource
@@ -460,7 +457,7 @@ function ArticlesContent() {
           <>
             <motion.div
               layout
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
             >
               <AnimatePresence mode="popLayout">
                 {articles.map((article) => (
@@ -492,7 +489,7 @@ function ArticlesContent() {
             )}
 
             {/* Article count */}
-            <p className="text-center text-xs text-text-muted mt-4">
+            <p className="text-center text-[10px] text-muted-foreground mt-4 font-display uppercase tracking-wide">
               Showing {articles.length} of {total.toLocaleString()} articles
             </p>
           </>

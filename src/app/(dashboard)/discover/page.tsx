@@ -35,12 +35,12 @@ export default async function DiscoverPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-heading font-bold text-foreground">
+    <div className="flex flex-col gap-6 halftone min-h-screen">
+      <div className="chapter-marker">
+        <h1 className="font-display text-3xl uppercase tracking-wider text-foreground">
           Discover
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground text-sm mt-1">
           Explore anime and manga across every category
         </p>
       </div>

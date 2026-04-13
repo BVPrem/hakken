@@ -107,7 +107,7 @@ export default async function SeriesPage({ params }: PageProps) {
     "Unknown";
 
   return (
-    <div className="flex flex-col gap-8 -mt-8 -mx-4 md:-mx-8">
+    <div className="flex flex-col gap-8 halftone min-h-screen -mt-8 -mx-4 md:-mx-8">
       {/* Hero Banner */}
       <div className="relative w-full h-56 md:h-72 overflow-hidden
         border-b-2 border-foreground/10">
@@ -133,8 +133,8 @@ export default async function SeriesPage({ params }: PageProps) {
           <div className="flex-shrink-0">
             <div
               className="relative w-40 md:w-52 aspect-[3/4]
-                rounded-xl overflow-hidden shadow-2xl
-                border border-border glow-purple"
+                overflow-hidden shadow-2xl
+                manga-panel"
             >
               {seriesData.coverImage ? (
                 <Image
@@ -158,16 +158,15 @@ export default async function SeriesPage({ params }: PageProps) {
           {/* Info */}
           <div className="flex flex-col gap-4 pt-32 md:pt-0 md:mt-auto">
             {/* Title */}
-            <div>
+            <div className="chapter-marker">
               <h1
-                className="text-2xl md:text-4xl font-heading
-                  font-bold text-foreground leading-tight"
+                className="font-display text-2xl md:text-4xl uppercase tracking-wider text-foreground"
               >
                 {displayTitle}
               </h1>
               {seriesData.titleRomaji &&
                 seriesData.titleRomaji !== displayTitle && (
-                  <p className="text-muted-foreground mt-1">
+                  <p className="text-muted-foreground text-sm mt-1">
                     {seriesData.titleRomaji}
                   </p>
                 )}
@@ -267,9 +266,7 @@ export default async function SeriesPage({ params }: PageProps) {
                 {seriesData.genres.map((g) => (
                   <span
                     key={g}
-                    className="text-sm px-3 py-1 rounded-full
-                      bg-primary/10 text-primary border
-                      border-primary/20"
+                    className="text-xs font-display uppercase tracking-wide px-2.5 py-1 bg-primary/10 text-primary border border-primary/30"
                   >
                     {g}
                   </span>
@@ -281,14 +278,13 @@ export default async function SeriesPage({ params }: PageProps) {
 
         {/* Synopsis */}
         {seriesData.synopsis && (
-          <div className="mt-8 max-w-4xl">
+          <div className="mt-8 max-w-4xl chapter-marker">
             <h2
-              className="text-lg font-heading font-semibold
-                text-foreground mb-3"
+              className="font-display text-lg uppercase tracking-wider text-foreground mb-3"
             >
               Synopsis
             </h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               {seriesData.synopsis}
             </p>
           </div>
@@ -296,10 +292,9 @@ export default async function SeriesPage({ params }: PageProps) {
 
         {/* Tags */}
         {seriesData.tags && seriesData.tags.length > 0 && (
-          <div className="mt-6 max-w-4xl">
+          <div className="mt-6 max-w-4xl chapter-marker">
             <h2
-              className="text-lg font-heading font-semibold
-                text-foreground mb-3"
+              className="font-display text-lg uppercase tracking-wider text-foreground mb-3"
             >
               Tags
             </h2>
@@ -307,9 +302,7 @@ export default async function SeriesPage({ params }: PageProps) {
               {seriesData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-xs px-2.5 py-1 rounded-lg
-                    bg-muted text-muted-foreground border
-                    border-border"
+                  className="text-[10px] font-display uppercase tracking-wide px-2 py-1 bg-muted text-muted-foreground border border-border"
                 >
                   {tag}
                 </span>
@@ -320,8 +313,7 @@ export default async function SeriesPage({ params }: PageProps) {
 
         {/* Coming soon sections */}
         <div
-          className="mt-10 grid grid-cols-1 md:grid-cols-2
-            gap-4 max-w-4xl"
+          className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl"
         >
           {[
             {
@@ -335,12 +327,12 @@ export default async function SeriesPage({ params }: PageProps) {
           ].map((card) => (
             <div
               key={card.title}
-              className="glass rounded-xl p-5 border border-border"
+              className="glass p-5"
             >
-              <h3 className="font-heading font-semibold text-foreground mb-1">
+              <h3 className="font-display text-sm uppercase tracking-wider text-foreground mb-1">
                 {card.title}
               </h3>
-              <p className="text-sm text-muted-foreground">{card.desc}</p>
+              <p className="text-xs text-muted-foreground">{card.desc}</p>
             </div>
           ))}
         </div>

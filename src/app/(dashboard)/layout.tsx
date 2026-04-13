@@ -15,11 +15,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen halftone">
       <Sidebar />
       <Navbar />
-      <main className="md:ml-64 pt-14 md:pt-0 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+      <main className="md:ml-56 pt-13 md:pt-0 min-h-screen">
+        <div className="max-w-screen-2xl mx-auto
+          px-4 md:px-8 py-6">
           {children}
         </div>
       </main>

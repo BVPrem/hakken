@@ -1,9 +1,9 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface SeriesCardProps {
   id: string;
@@ -25,64 +25,60 @@ export function SeriesCard({
   type,
   status,
   score,
-  genres,
   year,
   index = 0,
 }: SeriesCardProps) {
-  const displayTitle = title ?? "Unknown";
-  const isAiring = status === "RELEASING";
-
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, delay: index * 0.04 }}
+      transition={{ duration: 0.2, delay: index * 0.03 }}
     >
       <Link href={`/series/${id}`}>
-        <div className={cn(
-          "group relative overflow-hidden bg-card cursor-pointer",
-          "manga-panel panel-hover"
-        )}>
-          {/* Cover — manga volume proportions */}
-          <div className="relative aspect-[2/3] w-full
+        <div className="group panel-lift glass manga-panel
+          overflow-hidden w-[140px] sm:w-[150px] md:w-[160px]">
+
+          {/* Cover — tall portrait, manga volume ratio */}
+          <div className="relative w-full h-[205px] sm:h-[220px] md:h-[235px]
             overflow-hidden bg-muted">
             {coverImage ? (
               <Image
                 src={coverImage}
-                alt={displayTitle}
+                alt={title ?? "Series"}
                 fill
                 className="object-cover transition-transform
                   duration-500 group-hover:scale-105"
-                sizes="(max-width: 640px) 50vw,
-                       (max-width: 1024px) 33vw, 20vw"
+                sizes="160px"
               />
             ) : (
-              <div className="w-full h-full flex items-center
-                justify-center">
-                <span className="ink-text text-xs
-                  text-muted-foreground">
+              <div className="absolute inset-0 flex items-center
+                justify-center halftone">
+                <span className="font-display text-xs
+                  text-muted-foreground tracking-widest uppercase">
                   {type}
                 </span>
               </div>
             )}
 
-            {/* Airing indicator — red corner stamp */}
-            {isAiring && (
-              <div className="absolute top-0 right-0 bg-primary
-                text-primary-foreground text-[9px] font-display
-                uppercase tracking-wider px-1.5 py-0.5">
+            {/* Airing stamp */}
+            {status === "RELEASING" && (
+              <div className="absolute top-0 left-0
+                bg-primary text-primary-foreground
+                font-display text-[8px] tracking-widest
+                uppercase px-1.5 py-0.5">
                 Airing
               </div>
             )}
 
-            {/* Score — bottom left */}
+            {/* Score */}
             {score && (
-              <div className="absolute bottom-0 left-0
-                bg-background/90 border-t border-r border-border
-                flex items-center gap-1 px-2 py-0.5">
+              <div className="absolute bottom-0 right-0
+                bg-background/85 backdrop-blur-sm
+                flex items-center gap-0.5 px-1.5 py-0.5
+                border-t border-l border-border/50">
                 <Star className="w-2.5 h-2.5 text-primary
                   fill-primary" />
-                <span className="text-[11px] font-display
+                <span className="font-display text-[10px]
                   text-foreground">
                   {score.toFixed(1)}
                 </span>
@@ -90,17 +86,16 @@ export function SeriesCard({
             )}
           </div>
 
-          {/* Title bar */}
-          <div className="p-2 border-t-2
-            border-foreground/10 bg-card">
-            <p className="text-xs font-display uppercase
-              tracking-wide text-foreground line-clamp-2
+          {/* Title */}
+          <div className="px-2 py-1.5 border-t border-border/50">
+            <p className="font-display text-[10px] tracking-wide
+              uppercase text-foreground line-clamp-2
               leading-tight group-hover:text-primary
               transition-colors">
-              {displayTitle}
+              {title ?? "Unknown"}
             </p>
             {year && (
-              <p className="text-[10px] text-muted-foreground mt-0.5">
+              <p className="text-[9px] text-muted-foreground mt-0.5">
                 {year}
               </p>
             )}

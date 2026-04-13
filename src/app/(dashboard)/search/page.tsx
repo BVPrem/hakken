@@ -53,12 +53,12 @@ export default function SearchPage() {
   }, [query, search]);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-heading font-bold text-foreground">
+    <div className="flex flex-col gap-8 halftone min-h-screen">
+      <div className="flex flex-col gap-2 chapter-marker">
+        <h1 className="font-display text-3xl uppercase tracking-wider text-foreground">
           Search
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Find anime and manga across AniList, MAL and more
         </p>
       </div>

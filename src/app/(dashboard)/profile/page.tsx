@@ -52,17 +52,23 @@ export default async function ProfilePage() {
       : user?.firstName ?? user?.username ?? "Anime Fan";
 
   return (
-    <div className="flex flex-col gap-8 max-w-3xl">
-      <div className="flex items-center gap-5">
+    <div className="flex flex-col gap-8 max-w-3xl halftone min-h-screen">
+      <div className="chapter-marker">
+        <h1 className="font-display text-3xl uppercase tracking-wider text-foreground">
+          Profile
+        </h1>
+      </div>
+
+      <div className="flex items-center gap-5 glass p-6">
         <UserButton
           appearance={{
             elements: { avatarBox: "w-16 h-16" },
           }}
         />
         <div>
-          <h1 className="text-2xl font-heading font-bold text-foreground">
+          <h2 className="font-display text-xl uppercase tracking-wider text-foreground">
             {displayName}
-          </h1>
+          </h2>
           <p className="text-muted-foreground text-sm mt-0.5">
             {user?.primaryEmailAddress?.emailAddress}
           </p>
@@ -73,25 +79,25 @@ export default async function ProfilePage() {
       </div>
 
       {stats.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
           {Object.entries(STATUS_LABELS).map(([key, label]) => {
             const stat = stats.find((s) => s.status === key);
             const count = stat ? Number(stat.count) : 0;
             return (
               <div
                 key={key}
-                className="rounded-xl border border-border bg-card p-4 flex flex-col gap-1 text-center"
+                className="manga-panel-thin bg-card p-3 flex flex-col gap-1 text-center"
               >
-                <span className={`text-2xl font-heading font-bold ${STATUS_COLORS[key]}`}>
+                <span className={`text-xl font-display ${STATUS_COLORS[key]}`}>
                   {count}
                 </span>
-                <span className="text-xs text-muted-foreground">{label}</span>
+                <span className="text-[10px] text-muted-foreground font-display uppercase tracking-wide">{label}</span>
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-card p-8 text-center">
+        <div className="manga-panel bg-card p-8 text-center">
           <p className="text-muted-foreground">
             No series tracked yet.{" "}
             <a href="/search" className="text-primary hover:underline">
@@ -102,20 +108,20 @@ export default async function ProfilePage() {
       )}
 
       {recent.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-heading font-semibold text-foreground">
+        <div className="flex flex-col gap-3 chapter-marker">
+          <h3 className="font-display text-lg uppercase tracking-wider text-foreground">
             Recent Activity
-          </h2>
+          </h3>
           <div className="flex flex-col gap-2">
             {recent.map((entry) => (
               <div
                 key={entry.seriesId}
-                className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3"
+                className="flex items-center justify-between manga-panel-thin bg-card px-4 py-3"
               >
                 <span className="text-sm text-foreground font-medium truncate max-w-xs">
                   {entry.seriesId.replace("anilist-", "Series ")}
                 </span>
-                <span className={`text-xs font-medium ${STATUS_COLORS[entry.status]}`}>
+                <span className={`text-xs font-display uppercase tracking-wide ${STATUS_COLORS[entry.status]}`}>
                   {STATUS_LABELS[entry.status]}
                 </span>
               </div>

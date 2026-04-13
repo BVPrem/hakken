@@ -1,14 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Plus, Check, ChevronDown, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const STATUS_OPTIONS = [
   { value: "watching", label: "Watching" },
@@ -26,6 +21,8 @@ export function WatchlistButton({ seriesId }: WatchlistButtonProps) {
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch(`/api/user/series?seriesId=${seriesId}`)
@@ -37,6 +34,18 @@ export function WatchlistButton({ seriesId }: WatchlistButtonProps) {
       .catch(() => setLoading(false));
   }, [seriesId]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
   const handleSelect = async (newStatus: string) => {
     setSaving(true);
     try {
@@ -46,6 +55,7 @@ export function WatchlistButton({ seriesId }: WatchlistButtonProps) {
         body: JSON.stringify({ seriesId, status: newStatus }),
       });
       setStatus(newStatus);
+      setOpen(false);
     } finally {
       setSaving(false);
     }
@@ -58,6 +68,7 @@ export function WatchlistButton({ seriesId }: WatchlistButtonProps) {
         method: "DELETE",
       });
       setStatus(null);
+      setOpen(false);
     } finally {
       setSaving(false);
     }
@@ -75,40 +86,55 @@ export function WatchlistButton({ seriesId }: WatchlistButtonProps) {
   const currentLabel = STATUS_OPTIONS.find((o) => o.value === status)?.label;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant={status ? "default" : "outline"} className="gap-2" disabled={saving}>
-          {saving ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : status ? (
-            <Check className="w-4 h-4" />
-          ) : (
-            <Plus className="w-4 h-4" />
-          )}
-          {status ? currentLabel : "Add to List"}
-          <ChevronDown className="w-3.5 h-3.5 ml-1 opacity-60" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-44">
-        {STATUS_OPTIONS.map((opt) => (
-          <DropdownMenuItem
-            key={opt.value}
-            onClick={() => handleSelect(opt.value)}
-            className={status === opt.value ? "text-primary font-medium" : ""}
-          >
-            {status === opt.value && <Check className="w-3.5 h-3.5 mr-2" />}
-            {opt.label}
-          </DropdownMenuItem>
-        ))}
-        {status && (
-          <DropdownMenuItem
-            onClick={handleRemove}
-            className="text-destructive focus:text-destructive border-t border-border mt-1 pt-1"
-          >
-            Remove from List
-          </DropdownMenuItem>
+    <div className="relative" ref={menuRef}>
+      <Button 
+        variant={status ? "default" : "outline"} 
+        className="gap-2" 
+        disabled={saving}
+        onClick={() => !saving && setOpen(!open)}
+      >
+        {saving ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : status ? (
+          <Check className="w-4 h-4" />
+        ) : (
+          <Plus className="w-4 h-4" />
         )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        {status ? currentLabel : "Add to List"}
+        <ChevronDown className={cn(
+          "w-3.5 h-3.5 ml-1 opacity-60 transition-transform",
+          open && "rotate-180"
+        )} />
+      </Button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-44 
+          bg-popover border border-border shadow-md z-50">
+          {STATUS_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => handleSelect(opt.value)}
+              className={cn(
+                "w-full flex items-center gap-2 px-3 py-2 text-sm",
+                "text-left hover:bg-muted transition-colors",
+                status === opt.value ? "text-primary font-medium" : "text-foreground"
+              )}
+            >
+              {status === opt.value && <Check className="w-3.5 h-3.5" />}
+              {opt.label}
+            </button>
+          ))}
+          {status && (
+            <button
+              onClick={handleRemove}
+              className="w-full flex items-center px-3 py-2 text-sm 
+                text-destructive hover:bg-destructive/10 text-left border-t border-border"
+            >
+              Remove from List
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
