@@ -3,6 +3,12 @@ import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
   darkMode: "class",
+  safelist: [
+    "halftone", "glass", "glass-strong", "manga-panel",
+    "manga-panel-thin", "manga-panel-accent", "chapter-marker",
+    "panel-lift", "font-display-caps", "glow-red",
+    "gradient-text", "speed-lines",
+  ],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",

@@ -94,6 +94,10 @@
     border: 2px solid hsl(var(--foreground) / 0.15);
     border-radius: 0;
   }
+  .manga-panel-thin {
+    border: 1px solid hsl(var(--foreground) / 0.1);
+    border-radius: 0;
+  }
   .manga-panel-accent {
     border: 2px solid hsl(var(--primary));
     border-radius: 0;
