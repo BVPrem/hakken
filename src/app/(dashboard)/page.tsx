@@ -34,7 +34,7 @@ export default async function HomePage() {
     ((feedRes?.ok ? await feedRes.json() : null)?.articles ?? []) as FeedArticle[];
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-14">
 
       {/* Hero */}
       <div
@@ -42,8 +42,9 @@ export default async function HomePage() {
           overflow-hidden border-b border-foreground/10"
         style={{
           backgroundImage:
-            "radial-gradient(circle, hsl(var(--foreground) / 0.04) 1px, transparent 1px)",
+            "radial-gradient(circle, hsl(var(--foreground) / 0.05) 1px, transparent 1px)",
           backgroundSize: "16px 16px",
+          borderBottom: "1px solid hsl(var(--foreground) / 0.08)",
         }}
       >
         <p className="font-display text-[10px] tracking-[0.5em]

@@ -99,13 +99,13 @@ export function SeriesCarousel({ items, title }: SeriesCarouselProps) {
         ref={emblaRef}
         className="overflow-hidden cursor-grab active:cursor-grabbing"
       >
-        <div className="flex gap-2.5"
-          style={{ touchAction: "pan-y pinch-zoom" }}>
+        <div
+          style={{ display: "flex", gap: "12px", touchAction: "pan-y pinch-zoom" }}>
           {items.map((item, i) => (
             <div
               key={item.id}
               className="flex-none"
-              style={{ width: "clamp(100px, 14vw, 160px)" }}
+              style={{ width: "clamp(120px, 13vw, 150px)", flexShrink: 0 }}
             >
               <SeriesCard
                 id={item.id}

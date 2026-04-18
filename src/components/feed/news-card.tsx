@@ -40,9 +40,35 @@ export function NewsCard({
     : null;
 
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer"
-      className="group flex flex-col glass manga-panel
-        overflow-hidden panel-lift">
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        textDecoration: "none",
+        background: "var(--glass-bg, rgba(255,255,255,0.7))",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1.5px solid var(--glass-border, rgba(0,0,0,0.08))",
+        transition: "transform 0.12s ease, box-shadow 0.12s ease",
+        cursor: "pointer",
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.transform =
+          "translate(-2px, -2px)";
+        (e.currentTarget as HTMLElement).style.boxShadow =
+          "3px 3px 0px hsl(var(--primary) / 0.5)";
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.transform =
+          "translate(0, 0)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+      }}
+    >
 
       {/* Sentiment bar — 3px top edge */}
       <div className={cn(

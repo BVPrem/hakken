@@ -17,10 +17,10 @@ export default async function DashboardLayout({
     <div className="min-h-screen halftone">
       <Navbar />
       <main className="min-h-screen">
-        <div className="max-w-screen-2xl mx-auto
-          px-4 md:px-8
-          pt-14 md:pt-20
-          pb-8">
+        <div
+          className="max-w-screen-xl mx-auto px-4 md:px-8"
+          style={{ paddingTop: "88px" }}
+        >
           {children}
         </div>
       </main>

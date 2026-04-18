@@ -24,7 +24,7 @@ export function Sidebar() {
       initial={{ x: -16, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.25 }}
-      className="hidden md:flex flex-col w-56 min-h-screen
+      className="hidden flex-col w-56 min-h-screen
         fixed left-0 top-0 z-40
         glass border-r border-r-foreground/10"
     >
