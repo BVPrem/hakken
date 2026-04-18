@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Navbar } from "@/components/layout/navbar";
+
 
 export default async function DashboardLayout({
   children,
@@ -15,7 +15,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen halftone">
-      <Navbar />
+
       <main className="min-h-screen">
         <div
           className="max-w-screen-xl mx-auto px-4 md:px-8"

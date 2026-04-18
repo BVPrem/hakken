@@ -61,8 +61,16 @@ export function SeriesCarousel({ items, title }: SeriesCarouselProps) {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between px-0">
-        <h2 className="font-display text-xl uppercase
-          tracking-widest text-foreground chapter-marker">
+        <h2 style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: "20px",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "hsl(var(--foreground))",
+          borderLeft: "3px solid hsl(var(--primary))",
+          paddingLeft: "10px",
+          margin: 0,
+        }}>
           {title}
         </h2>
         <div className="flex items-center gap-1.5">

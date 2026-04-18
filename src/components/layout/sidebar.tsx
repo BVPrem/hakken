@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // still used for active bar animation
 import { Home, Search, Compass, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
@@ -20,10 +20,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <motion.aside
-      initial={{ x: -16, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.25 }}
+    <aside
       className="hidden flex-col w-56 min-h-screen
         fixed left-0 top-0 z-40
         glass border-r border-r-foreground/10"
@@ -98,6 +95,6 @@ export function Sidebar() {
         }} />
         <ThemeToggle />
       </div>
-    </motion.aside>
+    </aside>
   );
 }

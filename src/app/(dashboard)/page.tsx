@@ -21,12 +21,13 @@ export default async function HomePage() {
 
       {/* Hero */}
       <div
-        className="relative -mx-4 md:-mx-8 px-4 md:px-8 py-10
-          overflow-hidden border-b border-foreground/10"
+        className="relative -mx-4 md:-mx-8 px-4 md:px-8 py-10"
         style={{
+          position: "relative",
+          overflow: "hidden",
           backgroundImage:
-            "radial-gradient(circle, hsl(var(--foreground) / 0.05) 1px, transparent 1px)",
-          backgroundSize: "16px 16px",
+            "radial-gradient(circle, hsl(var(--foreground) / 0.045) 1px, transparent 1px)",
+          backgroundSize: "18px 18px",
           borderBottom: "1px solid hsl(var(--foreground) / 0.08)",
         }}
       >
@@ -38,12 +39,30 @@ export default async function HomePage() {
         </p>
         <h1 className="font-display text-5xl md:text-6xl
           uppercase tracking-tight text-foreground leading-[0.9]">
-          Your Anime &<br />
+          Your Anime <br />
           <span className="text-primary">Manga Feed</span>
         </h1>
         {/* Corner accent */}
         <div className="absolute top-0 right-0 w-20 h-20
           opacity-20 border-l-2 border-b-2 border-primary" />
+        {/* Decorative background kanji */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            right: "-20px",
+            top: "-20px",
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: "220px",
+            lineHeight: 1,
+            color: "hsl(var(--foreground) / 0.03)",
+            pointerEvents: "none",
+            userSelect: "none",
+            letterSpacing: "-0.05em",
+          }}
+        >
+          発見
+        </div>
       </div>
 
       {/* Trending carousel */}
@@ -84,11 +103,15 @@ export default async function HomePage() {
       {feedArticles.length > 0 && (
         <section className="flex flex-col gap-4">
           <h2
-            className="font-display text-xl uppercase
-              tracking-widest text-foreground"
             style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: "20px",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "hsl(var(--foreground))",
               borderLeft: "3px solid hsl(var(--primary))",
-              paddingLeft: "0.625rem",
+              paddingLeft: "10px",
+              margin: 0,
             }}
           >
             Latest News
@@ -115,39 +138,79 @@ export default async function HomePage() {
 
       {/* Coming Soon */}
       <section className="flex flex-col gap-4">
-        <h2
-          className="font-display text-xl uppercase
-            tracking-widest text-foreground"
-          style={{
-            borderLeft: "3px solid hsl(var(--primary))",
-            paddingLeft: "0.625rem",
-          }}
-        >
-          Coming Soon
-        </h2>
+          <h2
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: "20px",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "hsl(var(--foreground))",
+              borderLeft: "3px solid hsl(var(--primary))",
+              paddingLeft: "10px",
+              margin: 0,
+            }}
+          >
+            Coming Soon
+          </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { t: "Sentiment Pulse", d: "Episode mood tracking" },
-            { t: "Hakken AI",       d: "Ask anything"          },
-            { t: "Friend Match",    d: "Co-watch finder"       },
+            { t: "Sentiment Pulse", d: "Real-time episode mood" },
+            { t: "Hakken AI",       d: "Ask anything about anime" },
+            { t: "Friend Match",    d: "Find what to watch together" },
           ].map((c) => (
             <div
               key={c.t}
-              className="p-4 flex flex-col gap-1"
               style={{
+                padding: "16px",
                 background: "var(--glass-bg)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
                 border: "1.5px solid var(--glass-border)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+                transition: "transform 0.12s ease, box-shadow 0.12s ease",
+                cursor: "default",
+              }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.transform = "translate(-2px,-2px)";
+                el.style.boxShadow = "3px 3px 0 hsl(var(--primary) / 0.4)";
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.transform = "translate(0,0)";
+                el.style.boxShadow = "none";
               }}
             >
-              <p className="font-display text-xs uppercase
-                tracking-widest text-foreground">
+              <p style={{
+                margin: 0,
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "13px",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "hsl(var(--foreground))",
+              }}>
                 {c.t}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p style={{
+                margin: 0,
+                fontSize: "12px",
+                color: "hsl(var(--muted-foreground))",
+                lineHeight: 1.5,
+              }}>
                 {c.d}
               </p>
+              <span style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "9px",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "hsl(var(--primary))",
+                marginTop: "4px",
+              }}>
+                Coming Soon
+              </span>
             </div>
           ))}
         </div>
