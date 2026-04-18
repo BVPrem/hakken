@@ -36,18 +36,18 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  // Pill nav inline styles — guaranteed to render correctly regardless of Tailwind
+  // Pill appearance styles — Tailwind hidden/md:flex controls display; inline only handles position & look
   const pillStyle: React.CSSProperties = {
     position: "fixed",
     top: "12px",
     left: "50%",
     transform: "translateX(-50%)",
     zIndex: 9999,
-    display: "flex",
+    // NOTE: no display here — let className="hidden md:flex" handle it
     alignItems: "center",
     gap: "2px",
     padding: "6px",
-    width: "max-content",   // ← shrink-wraps to content; prevents full-width stretch
+    width: "max-content",
     borderRadius: "9999px",
     background: "var(--glass-bg, rgba(255,255,255,0.75))",
     backdropFilter: "blur(20px)",
@@ -185,7 +185,7 @@ export function Navbar() {
 
       {/* ── Mobile top bar ── */}
       <header
-        className="md:hidden"
+        className="md:hidden flex"
         style={{
           position: "fixed",
           top: 0,
@@ -193,7 +193,7 @@ export function Navbar() {
           right: 0,
           zIndex: 9999,
           height: "52px",
-          display: "flex",
+          // NOTE: no display here — let className="md:hidden flex" handle it
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0 16px",
