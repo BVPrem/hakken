@@ -47,6 +47,7 @@ export function Navbar() {
     alignItems: "center",
     gap: "2px",
     padding: "6px",
+    width: "max-content",   // ← shrink-wraps to content; prevents full-width stretch
     borderRadius: "9999px",
     background: "var(--glass-bg, rgba(255,255,255,0.75))",
     backdropFilter: "blur(20px)",

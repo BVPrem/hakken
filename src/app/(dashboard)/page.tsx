@@ -1,37 +1,20 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { series } from "@/lib/db/schema";
+import { series, articles } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { SeriesCarousel } from "@/components/series/series-carousel";
 import { NewsCard } from "@/components/feed/news-card";
 
-interface FeedArticle {
-  id: string;
-  title: string;
-  summary: string | null;
-  source: string;
-  sentiment: string | null;
-  sentimentScore: number | null;
-  publishedAt: string | null;
-  imageUrl: string | null;
-  url: string;
-}
-
 export default async function HomePage() {
   const user = await currentUser();
 
-  const [trendingSeries, airingSeries] = await Promise.all([
+  const [trendingSeries, airingSeries, feedArticles] = await Promise.all([
     db.select().from(series).orderBy(desc(series.popularity)).limit(20),
     db.select().from(series).where(eq(series.status, "RELEASING"))
       .orderBy(desc(series.popularity)).limit(20),
+    // Direct DB query — no HTTP self-fetch, never breaks on port changes
+    db.select().from(articles).orderBy(desc(articles.publishedAt)).limit(6),
   ]);
-
-  const feedRes = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/feed?limit=6`,
-    { cache: "no-store" }
-  ).catch(() => null);
-  const feedArticles =
-    ((feedRes?.ok ? await feedRes.json() : null)?.articles ?? []) as FeedArticle[];
 
   return (
     <div className="flex flex-col gap-14">
@@ -121,7 +104,7 @@ export default async function HomePage() {
                 source={a.source}
                 sentiment={a.sentiment}
                 sentimentScore={a.sentimentScore}
-                publishedAt={a.publishedAt}
+                publishedAt={a.publishedAt ? a.publishedAt.toISOString() : null}
                 imageUrl={a.imageUrl}
                 url={a.url}
               />
