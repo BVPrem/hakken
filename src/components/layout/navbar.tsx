@@ -10,12 +10,12 @@ import { UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "./theme-toggle";
 
 const desktopNav = [
-  { href: "/",         label: "Home"     },
-  { href: "/discover", label: "Discover" },
-  { href: "/search",   label: "Search"   },
-  { href: "/friends",  label: "Friends"  },
-  { href: "/profile",  label: "Profile"  },
-];
+  { href: "/",         label: "Home",     icon: Home    },
+  { href: "/discover", label: "Discover", icon: Compass },
+  { href: "/search",   label: "Search",   icon: Search  },
+  { href: "/friends",  label: "Friends",  icon: Users   },
+  { href: "/profile",  label: "Profile",  icon: User    },
+] as const;
 
 const mobileNav = [
   { href: "/",         label: "Home",     icon: Home    },
@@ -45,18 +45,18 @@ export function Navbar() {
     zIndex: 9999,
     // NOTE: no display here — let className="hidden md:flex" handle it
     alignItems: "center",
-    gap: "2px",
-    padding: "6px",
+    gap: "4px",
+    padding: "7px 8px",
     width: "max-content",
     borderRadius: "9999px",
     background: "var(--glass-bg, rgba(255,255,255,0.75))",
     backdropFilter: "blur(20px)",
     WebkitBackdropFilter: "blur(20px)",
-    border: "1px solid var(--glass-border, rgba(0,0,0,0.1))",
+    border: "2px solid hsl(var(--foreground))",
     boxShadow: scrolled
-      ? "0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08)"
-      : "0 4px 16px rgba(0,0,0,0.08)",
-    transition: "box-shadow 0.3s ease",
+      ? "4px 4px 0px hsl(var(--primary))"
+      : "4px 4px 0px hsl(var(--foreground))",
+    transition: "box-shadow 0.2s ease, transform 0.2s ease",
     whiteSpace: "nowrap",
   };
 
@@ -68,35 +68,27 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "6px 16px 6px 12px",
-            borderRadius: "9999px",
-            textDecoration: "none",
-            transition: "background 0.15s",
-          }}
-          onMouseEnter={e =>
-            ((e.currentTarget as HTMLElement).style.background =
-              "rgba(0,0,0,0.05)")}
-          onMouseLeave={e =>
-            ((e.currentTarget as HTMLElement).style.background =
-              "transparent")}
+          className={cn(
+            "flex items-center gap-2 rounded-full no-underline text-foreground",
+            "pl-3 pr-4 py-2 transition-[background,box-shadow] duration-150",
+            "hover:bg-foreground/[0.06]",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          )}
         >
           <span style={{
             fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "16px",
+            fontSize: "24px",
             letterSpacing: "0.15em",
             textTransform: "uppercase",
             color: "hsl(var(--foreground))",
             lineHeight: 1,
+            marginTop: "2px"
           }}>
             発見
           </span>
           <span style={{
             fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "8px",
+            fontSize: "11px",
             letterSpacing: "0.4em",
             textTransform: "uppercase",
             color: "hsl(var(--primary))",
@@ -107,75 +99,50 @@ export function Navbar() {
         </Link>
 
         {/* Divider */}
-        <div style={{
-          width: "1px",
-          height: "20px",
-          background: "hsl(var(--foreground) / 0.12)",
-          margin: "0 4px",
-          flexShrink: 0,
-        }} />
+        <div
+          className="mx-1 h-5 w-px shrink-0 bg-foreground/12"
+          aria-hidden
+        />
 
         {/* Nav links */}
         {desktopNav.map((item) => {
+          const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              style={{
-                padding: "7px 14px",
-                borderRadius: "9999px",
-                fontFamily: "'Bebas Neue', sans-serif",
-                fontSize: "11px",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                textDecoration: "none",
-                transition: "all 0.15s",
-                background: isActive
-                  ? "hsl(var(--primary))"
-                  : "transparent",
-                color: isActive
-                  ? "hsl(var(--primary-foreground))"
-                  : "hsl(var(--muted-foreground))",
-              }}
-              onMouseEnter={e => {
-                if (!isActive) {
-                  (e.currentTarget as HTMLElement).style.background =
-                    "hsl(var(--foreground) / 0.06)";
-                  (e.currentTarget as HTMLElement).style.color =
-                    "hsl(var(--foreground))";
-                }
-              }}
-              onMouseLeave={e => {
-                if (!isActive) {
-                  (e.currentTarget as HTMLElement).style.background =
-                    "transparent";
-                  (e.currentTarget as HTMLElement).style.color =
-                    "hsl(var(--muted-foreground))";
-                }
-              }}
+              className={cn(
+                "flex items-center gap-2 rounded-full px-3.5 py-1.5 no-underline",
+                "font-display text-[11px] tracking-[0.15em] uppercase",
+                "border-2 transition-all duration-150",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                isActive
+                  ? "border-foreground bg-foreground text-background shadow-[2px_2px_0_hsl(var(--primary))]"
+                  : "border-transparent text-muted-foreground hover:border-foreground/20 hover:bg-foreground/[0.03] hover:text-foreground"
+              )}
             >
+              <Icon
+                className={cn(
+                  "size-3.5 shrink-0 opacity-100",
+                  isActive ? "text-background" : "text-current"
+                )}
+                strokeWidth={isActive ? 2.5 : 2}
+                aria-hidden
+              />
               {item.label}
             </Link>
           );
         })}
 
         {/* Divider */}
-        <div style={{
-          width: "1px",
-          height: "20px",
-          background: "hsl(var(--foreground) / 0.12)",
-          margin: "0 4px",
-          flexShrink: 0,
-        }} />
+        <div
+          className="mx-1 h-5 w-px shrink-0 bg-foreground/12"
+          aria-hidden
+        />
 
         {/* Actions */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          paddingRight: "4px",
-        }}>
+        <div className="flex items-center gap-1 pr-1">
           <ThemeToggle />
           <UserButton appearance={{
             elements: { avatarBox: "w-7 h-7" },
@@ -200,24 +167,29 @@ export function Navbar() {
           background: "var(--glass-bg, rgba(255,255,255,0.85))",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid var(--glass-border, rgba(0,0,0,0.08))",
+          borderBottom: "2px solid hsl(var(--foreground))",
+          boxShadow: scrolled ? "0 4px 0px hsl(var(--primary))" : "none",
+          transition: "box-shadow 0.2s ease"
         }}
       >
-        <Link href="/" style={{
-          display: "flex", alignItems: "center",
-          gap: "6px", textDecoration: "none",
-        }}>
+        <Link
+          href="/"
+          className="flex items-center gap-2 no-underline text-foreground
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+        >
           <span style={{
             fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "18px", letterSpacing: "0.15em",
+            fontSize: "26px", letterSpacing: "0.15em",
             textTransform: "uppercase",
             color: "hsl(var(--foreground))",
+            marginTop: "2px"
           }}>発見</span>
           <span style={{
             fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "8px", letterSpacing: "0.35em",
+            fontSize: "12px", letterSpacing: "0.35em",
             textTransform: "uppercase",
             color: "hsl(var(--primary))",
+            marginLeft: "2px"
           }}>Hakken</span>
         </Link>
 
@@ -228,19 +200,25 @@ export function Navbar() {
           }} />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
+            className="group relative flex items-center justify-center overflow-hidden
+              border-2 border-foreground bg-background transition-transform
+              active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             style={{
               width: "32px", height: "32px",
-              display: "flex", alignItems: "center",
-              justifyContent: "center",
-              background: "transparent", border: "none",
+              boxShadow: "2px 2px 0px hsl(var(--foreground))",
               cursor: "pointer",
-              color: "hsl(var(--muted-foreground))",
+              color: "hsl(var(--foreground))",
             }}
             aria-label="Menu"
           >
-            {mobileOpen
-              ? <X className="w-4 h-4" />
-              : <Menu className="w-4 h-4" />}
+            {/* Halftone hover effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity halftone" />
+            
+            <div className="relative z-10 flex items-center justify-center">
+              {mobileOpen
+                ? <X className="w-4 h-4 transition-transform group-hover:rotate-90" strokeWidth={2.5} />
+                : <Menu className="w-4 h-4 transition-transform group-hover:scale-110" strokeWidth={2.5} />}
+            </div>
           </button>
         </div>
       </header>

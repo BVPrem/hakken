@@ -8,8 +8,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env.local from project root (two levels up from src/crawler/)
-env_path = Path(__file__).parent.parent.parent / ".env.local"
+# Load .env.local from project root (one level up from src/crawler/)
+env_path = Path(__file__).parent.parent / ".env.local"
 load_dotenv(dotenv_path=env_path)
 
 # ─── Database ────────────────────────────────────────────

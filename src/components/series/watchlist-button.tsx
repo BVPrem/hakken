@@ -86,51 +86,52 @@ export function WatchlistButton({ seriesId }: WatchlistButtonProps) {
   const currentLabel = STATUS_OPTIONS.find((o) => o.value === status)?.label;
 
   return (
-    <div className="relative" ref={menuRef}>
-      <Button 
-        variant={status ? "default" : "outline"} 
-        className="gap-2" 
+    <div className="relative mt-2" ref={menuRef}>
+      <button 
+        className={cn(
+          "w-full md:w-auto px-5 py-3 flex items-center justify-center gap-2",
+          "border-4 border-foreground font-display uppercase tracking-widest text-base md:text-lg transition-transform",
+          status ? "bg-primary text-primary-foreground" : "bg-background text-foreground halftone",
+          !saving && "active:translate-x-[2px] active:translate-y-[2px]"
+        )}
+        style={{ boxShadow: saving ? 'none' : '4px 4px 0 hsl(var(--foreground))' }}
         disabled={saving}
         onClick={() => !saving && setOpen(!open)}
       >
         {saving ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+           <div className="w-5 h-5 border-4 border-current border-t-transparent rounded-full animate-spin" />
         ) : status ? (
-          <Check className="w-4 h-4" />
+          <Check className="w-5 h-5" strokeWidth={3} />
         ) : (
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" strokeWidth={3} />
         )}
-        {status ? currentLabel : "Add to List"}
-        <ChevronDown className={cn(
-          "w-3.5 h-3.5 ml-1 opacity-60 transition-transform",
-          open && "rotate-180"
-        )} />
-      </Button>
+        <span className="mt-0.5">{status ? currentLabel : "Add to List"}</span>
+      </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1 w-44 
-          bg-popover border border-border shadow-md z-50">
+        <div className="absolute top-14 left-0 w-64 bg-background border-4 border-foreground z-50 overflow-hidden"
+             style={{ boxShadow: "6px 6px 0 hsl(var(--foreground))" }}>
           {STATUS_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => handleSelect(opt.value)}
               className={cn(
-                "w-full flex items-center gap-2 px-3 py-2 text-sm",
-                "text-left hover:bg-muted transition-colors",
-                status === opt.value ? "text-primary font-medium" : "text-foreground"
+                "w-full flex items-center gap-3 px-4 py-3 border-b-2 border-foreground/10",
+                "text-left hover:bg-muted font-display tracking-widest uppercase transition-colors text-sm",
+                status === opt.value ? "text-primary bg-primary/5" : "text-foreground"
               )}
             >
-              {status === opt.value && <Check className="w-3.5 h-3.5" />}
-              {opt.label}
+              {status === opt.value ? <Check className="w-4 h-4 text-primary" strokeWidth={3} /> : <div className="w-4 h-4" />}
+              <span className="mt-0.5">{opt.label}</span>
             </button>
           ))}
           {status && (
             <button
               onClick={handleRemove}
-              className="w-full flex items-center px-3 py-2 text-sm 
-                text-destructive hover:bg-destructive/10 text-left border-t border-border"
+              className="w-full flex items-center gap-3 px-4 py-3 bg-red-500/10 text-red-600 hover:bg-red-500/20 text-left font-display tracking-widest uppercase text-sm"
             >
-              Remove from List
+              <div className="w-4 h-4" />
+              <span className="mt-0.5">Remove</span>
             </button>
           )}
         </div>

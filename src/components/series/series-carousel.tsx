@@ -59,8 +59,8 @@ export function SeriesCarousel({ items, title }: SeriesCarouselProps) {
   );
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between px-0">
+    <section className="flex flex-col gap-6 md:gap-7">
+      <div className="flex items-center justify-between gap-4 px-0">
         <h2 style={{
           fontFamily: "'Bebas Neue', sans-serif",
           fontSize: "20px",
@@ -73,32 +73,36 @@ export function SeriesCarousel({ items, title }: SeriesCarouselProps) {
         }}>
           {title}
         </h2>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={scrollPrev}
             disabled={prevDisabled}
             className={cn(
-              "w-8 h-8 flex items-center justify-center",
-              "border border-foreground/20 transition-all",
-              "hover:border-primary hover:text-primary",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+              "group relative overflow-hidden flex items-center justify-center",
+              "w-8 h-8 border-2 border-foreground bg-background transition-transform",
+              "disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none",
+              !prevDisabled && "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             )}
+            style={prevDisabled ? {} : { boxShadow: "2px 2px 0px hsl(var(--foreground))" }}
             aria-label="Scroll left"
           >
-            <ChevronLeft className="w-4 h-4" />
+            {!prevDisabled && <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity halftone" />}
+            <ChevronLeft className="relative z-10 w-4 h-4 text-foreground transition-transform group-hover:-translate-x-0.5" strokeWidth={2.5} />
           </button>
           <button
             onClick={scrollNext}
             disabled={nextDisabled}
             className={cn(
-              "w-8 h-8 flex items-center justify-center",
-              "border border-foreground/20 transition-all",
-              "hover:border-primary hover:text-primary",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+              "group relative overflow-hidden flex items-center justify-center",
+              "w-8 h-8 border-2 border-foreground bg-background transition-transform",
+              "disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none",
+              !nextDisabled && "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             )}
+            style={nextDisabled ? {} : { boxShadow: "2px 2px 0px hsl(var(--foreground))" }}
             aria-label="Scroll right"
           >
-            <ChevronRight className="w-4 h-4" />
+            {!nextDisabled && <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity halftone" />}
+            <ChevronRight className="relative z-10 w-4 h-4 text-foreground transition-transform group-hover:translate-x-0.5" strokeWidth={2.5} />
           </button>
         </div>
       </div>
@@ -108,12 +112,16 @@ export function SeriesCarousel({ items, title }: SeriesCarouselProps) {
         className="overflow-hidden cursor-grab active:cursor-grabbing"
       >
         <div
-          style={{ display: "flex", gap: "12px", touchAction: "pan-y pinch-zoom" }}>
+          className="flex items-start gap-4 md:gap-5"
+          style={{ touchAction: "pan-y pinch-zoom" }}
+        >
           {items.map((item, i) => (
             <div
               key={item.id}
-              className="flex-none"
-              style={{ width: "clamp(120px, 13vw, 150px)", flexShrink: 0 }}
+              className="flex w-full min-w-0 shrink-0 flex-none flex-col"
+              style={{
+                width: "clamp(150px, 18vw, 220px)",
+              }}
             >
               <SeriesCard
                 id={item.id}

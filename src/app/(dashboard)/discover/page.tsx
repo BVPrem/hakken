@@ -35,18 +35,18 @@ export default async function DiscoverPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-6 halftone min-h-screen">
-      <div className="chapter-marker">
+    <div className="flex flex-col gap-8 md:gap-10 halftone min-h-screen pb-8">
+      <div className="chapter-marker space-y-2">
         <h1 className="font-display text-3xl uppercase tracking-wider text-foreground">
           Discover
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground text-sm md:text-base">
           Explore anime and manga across every category
         </p>
       </div>
 
       <Tabs defaultValue="popular">
-        <TabsList className="bg-card border border-border">
+        <TabsList className="bg-card border border-border p-1 gap-1">
           <TabsTrigger value="popular">Popular</TabsTrigger>
           <TabsTrigger value="airing">Airing Now</TabsTrigger>
           <TabsTrigger value="top">Top Rated</TabsTrigger>
@@ -57,9 +57,12 @@ export default async function DiscoverPage() {
           { value: "airing", data: airing },
           { value: "top", data: top },
         ].map(({ value, data }) => (
-          <TabsContent key={value} value={value} className="mt-6">
+          <TabsContent key={value} value={value} className="mt-8 md:mt-10">
             {data.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              <div
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4
+                  lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5 md:gap-6"
+              >
                 {data.map((s, i) => (
                   <SeriesCard
                     key={s.id}

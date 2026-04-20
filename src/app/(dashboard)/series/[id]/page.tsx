@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { db } from "@/lib/db";
@@ -6,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { getAniListById, getStudio } from "@/lib/api/anilist";
 import { WatchlistButton } from "@/components/series/watchlist-button";
 import { Badge } from "@/components/ui/badge";
+import { SentimentChart } from "@/components/charts/sentiment-chart";
 import {
   Star,
   Tv,
@@ -107,34 +109,42 @@ export default async function SeriesPage({ params }: PageProps) {
     "Unknown";
 
   return (
-    <div className="flex flex-col gap-8 halftone min-h-screen -mt-8 -mx-4 md:-mx-8">
+    <div className="flex flex-col gap-8 bg-background min-h-screen pb-16">
       {/* Hero Banner */}
-      <div className="relative w-full h-56 md:h-72 overflow-hidden
-        border-b-2 border-foreground/10">
+      <div 
+        className="relative w-full overflow-hidden border-b-[6px] border-foreground"
+        style={{ height: "300px" }}
+      >
         {seriesData.bannerImage ? (
           <Image
             src={seriesData.bannerImage}
             alt={displayTitle}
             fill
-            className="object-cover"
+            className="object-cover opacity-90"
             priority
+            sizes="100vw"
           />
         ) : (
           <div className="w-full h-full halftone bg-muted" />
         )}
+        <div className="absolute inset-0 halftone opacity-30 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-t
-          from-background via-background/50 to-transparent" />
+          from-background via-background/60 to-transparent" />
       </div>
 
       {/* Content */}
-      <div className="px-4 md:px-8 -mt-32 relative z-10">
+      <div className="px-4 md:px-8 max-w-screen-xl mx-auto w-full -mt-36 relative z-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Cover art */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex justify-center md:justify-start">
             <div
-              className="relative w-40 md:w-52 aspect-[3/4]
-                overflow-hidden shadow-2xl
-                manga-panel"
+              className="relative overflow-hidden bg-background
+                border-4 border-foreground"
+              style={{
+                width: "220px", 
+                height: "330px",
+                boxShadow: "6px 6px 0px hsl(var(--foreground))"
+              }}
             >
               {seriesData.coverImage ? (
                 <Image
@@ -143,117 +153,102 @@ export default async function SeriesPage({ params }: PageProps) {
                   fill
                   className="object-cover"
                   priority
+                  sizes="220px"
                 />
               ) : (
                 <div
-                  className="w-full h-full bg-muted
+                  className="w-full h-full bg-muted halftone
                     flex items-center justify-center"
                 >
-                  <Tv className="w-12 h-12 text-muted-foreground" />
+                  <Tv className="w-12 h-12 text-muted-foreground opacity-30" />
                 </div>
               )}
             </div>
           </div>
 
           {/* Info */}
-          <div className="flex flex-col gap-4 pt-32 md:pt-0 md:mt-auto">
+          <div className="flex flex-col gap-6 pt-6 md:pt-36 w-full">
             {/* Title */}
-            <div className="chapter-marker">
+            <div>
               <h1
-                className="font-display text-2xl md:text-4xl uppercase tracking-wider text-foreground"
+                className="font-display text-4xl md:text-5xl uppercase tracking-widest text-foreground leading-[1.05]"
               >
                 {displayTitle}
               </h1>
               {seriesData.titleRomaji &&
                 seriesData.titleRomaji !== displayTitle && (
-                  <p className="text-muted-foreground text-sm mt-1">
+                  <p className="font-display text-xl uppercase tracking-wide text-primary mt-1 border-b-2 border-foreground/10 pb-4">
                     {seriesData.titleRomaji}
                   </p>
                 )}
             </div>
 
-            {/* Meta row */}
-            <div className="flex flex-wrap items-center gap-3">
-              {seriesData.averageScore && (
-                <div
-                  className="flex items-center gap-1.5
-                    bg-yellow-400/10 border border-yellow-400/20
-                    rounded-full px-3 py-1"
-                >
-                  <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                  <span className="text-sm font-semibold text-yellow-400">
-                    {seriesData.averageScore.toFixed(1)}
+            {/* Databook Metrics Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 border-4 border-foreground bg-background w-full max-w-3xl"
+              style={{ boxShadow: "6px 6px 0px hsl(var(--foreground))" }}>
+              
+              {/* Score */}
+              <div className="flex flex-col p-4 border-b-4 border-r-4 border-foreground bg-background">
+                <span className="font-display text-[12px] uppercase text-muted-foreground tracking-widest mb-1">Score</span>
+                <div className="flex items-center gap-2 font-display text-2xl text-foreground">
+                  <Star className="w-5 h-5 text-primary fill-primary" />
+                  {seriesData.averageScore ? seriesData.averageScore.toFixed(1) : "N/A"}
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="flex flex-col p-4 border-b-4 md:border-r-4 border-foreground halftone">
+                <span className="font-display text-[12px] uppercase text-muted-foreground tracking-widest mb-1">Status</span>
+                <span className={cn(
+                  "font-display text-xl uppercase tracking-widest",
+                   seriesData.status === "RELEASING" ? "text-primary" : "text-foreground"
+                )}>
+                  {seriesData.status === "RELEASING" ? "Airing" : seriesData.status || "Unknown"}
+                </span>
+              </div>
+
+              {/* Format/Count */}
+              <div className="flex flex-col p-4 border-r-4 border-b-4 md:border-b-0 border-foreground bg-background">
+                <span className="font-display text-[12px] uppercase text-muted-foreground tracking-widest mb-1">
+                  {seriesData.type === "anime" ? "Episodes" : "Chapters"}
+                </span>
+                <div className="flex items-center gap-2 font-display text-xl text-foreground uppercase tracking-widest">
+                  {seriesData.type === "anime" ? <Tv className="w-4 h-4 text-primary" /> : <BookOpen className="w-4 h-4 text-primary" />}
+                  {seriesData.episodeCount || seriesData.chapterCount || "TBA"}
+                </div>
+              </div>
+
+              {/* Year */}
+              <div className="flex flex-col p-4 border-b-4 md:border-b-0 md:border-r-0 border-foreground halftone">
+                <span className="font-display text-[12px] uppercase text-muted-foreground tracking-widest mb-1">Season</span>
+                <div className="flex items-center gap-2 font-display text-xl text-foreground uppercase tracking-widest">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  {seriesData.season ? `${seriesData.season} ${seriesData.seasonYear}` : (seriesData.seasonYear || "TBA")}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-6 max-w-3xl mt-2">
+              {/* Studios */}
+              {seriesData.studios && seriesData.studios.length > 0 && (
+                <div className="flex flex-col p-3 border-l-4 border-primary pl-4 bg-muted/40">
+                  <span className="font-display text-[10px] uppercase text-muted-foreground tracking-widest">Studio</span>
+                  <span className="font-sans font-bold text-sm uppercase text-foreground">
+                    {seriesData.studios.join(", ")}
                   </span>
                 </div>
               )}
-
-              {seriesData.status && (
-                <Badge
-                  variant="outline"
-                  className={
-                    seriesData.status === "RELEASING"
-                      ? "border-green-500/30 text-green-400"
-                      : "border-border text-muted-foreground"
-                  }
-                >
-                  {seriesData.status === "RELEASING"
-                    ? "Currently Airing"
-                    : seriesData.status === "FINISHED"
-                    ? "Finished"
-                    : seriesData.status}
-                </Badge>
-              )}
-
-              {seriesData.type === "anime" ? (
-                <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-                  <Tv className="w-3.5 h-3.5" />
-                  <span>
-                    {seriesData.episodeCount
-                      ? `${seriesData.episodeCount} episodes`
-                      : "Anime"}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>
-                    {seriesData.chapterCount
-                      ? `${seriesData.chapterCount} chapters`
-                      : "Manga"}
-                  </span>
-                </div>
-              )}
-
-              {seriesData.seasonYear && (
-                <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>
-                    {seriesData.season
-                      ? `${seriesData.season} ${seriesData.seasonYear}`
-                      : seriesData.seasonYear}
-                  </span>
-                </div>
-              )}
-
+              {/* Popularity */}
               {seriesData.popularity && (
-                <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>
-                    {seriesData.popularity.toLocaleString()} fans
+                <div className="flex flex-col p-3 border-l-4 border-primary pl-4 bg-muted/40">
+                  <span className="font-display text-[10px] uppercase text-muted-foreground tracking-widest">Fans</span>
+                  <span className="font-sans font-bold text-sm uppercase text-foreground flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                    {seriesData.popularity.toLocaleString()}
                   </span>
                 </div>
               )}
             </div>
-
-            {/* Studios */}
-            {seriesData.studios && seriesData.studios.length > 0 && (
-              <p className="text-sm text-muted-foreground">
-                <span className="opacity-60">Studio: </span>
-                <span className="text-accent">
-                  {seriesData.studios.join(", ")}
-                </span>
-              </p>
-            )}
 
             {/* Watchlist Button */}
             <div className="pt-2">
@@ -278,31 +273,37 @@ export default async function SeriesPage({ params }: PageProps) {
 
         {/* Synopsis */}
         {seriesData.synopsis && (
-          <div className="mt-8 max-w-4xl chapter-marker">
+          <div className="mt-16 w-full relative">
             <h2
-              className="font-display text-lg uppercase tracking-wider text-foreground mb-3"
+              className="font-display text-3xl uppercase tracking-widest text-foreground bg-background px-4 absolute -top-5 left-4 z-10"
             >
               Synopsis
             </h2>
-            <p className="text-muted-foreground leading-relaxed text-sm">
-              {seriesData.synopsis}
-            </p>
+            <div className="border-4 border-foreground p-6 md:p-10 bg-background relative"
+              style={{ boxShadow: "6px 6px 0px hsl(var(--foreground))" }}>
+              <div className="absolute top-0 right-0 w-12 h-12 border-l-4 border-b-4 border-foreground halftone border-opacity-30" />
+              <p className="text-foreground leading-loose text-sm md:text-base font-medium opacity-90 text-justify relative z-10">
+                {seriesData.synopsis}
+              </p>
+            </div>
           </div>
         )}
 
         {/* Tags */}
         {seriesData.tags && seriesData.tags.length > 0 && (
-          <div className="mt-6 max-w-4xl chapter-marker">
+          <div className="mt-16 w-full">
             <h2
-              className="font-display text-lg uppercase tracking-wider text-foreground mb-3"
+              className="font-display text-2xl uppercase tracking-widest text-foreground mb-6"
             >
               Tags
             </h2>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {seriesData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-[10px] font-display uppercase tracking-wide px-2 py-1 bg-muted text-muted-foreground border border-border"
+                  className="font-display text-[11px] md:text-[13px] uppercase tracking-wider px-4 py-2 
+                    border-2 border-foreground bg-muted text-foreground transition-transform hover:-translate-y-1"
+                  style={{ boxShadow: "3px 3px 0px hsl(var(--foreground))" }}
                 >
                   {tag}
                 </span>
@@ -311,30 +312,44 @@ export default async function SeriesPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Coming soon sections */}
-        <div
-          className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl"
-        >
-          {[
-            {
-              title: "Sentiment Pulse",
-              desc: "Community mood tracking — coming soon",
-            },
-            {
-              title: "Latest News",
-              desc: "Articles about this series — coming soon",
-            },
-          ].map((card) => (
-            <div
-              key={card.title}
-              className="glass p-5"
-            >
-              <h3 className="font-display text-sm uppercase tracking-wider text-foreground mb-1">
-                {card.title}
-              </h3>
-              <p className="text-xs text-muted-foreground">{card.desc}</p>
-            </div>
-          ))}
+        {/* Sentiment Pulse */}
+        <div className="mt-8 max-w-4xl">
+          <h2 style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: "18px",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "hsl(var(--foreground))",
+            borderLeft: "3px solid hsl(var(--primary))",
+            paddingLeft: "10px",
+            margin: "0 0 16px 0",
+          }}>
+            Sentiment Pulse
+          </h2>
+          <p style={{
+            fontSize: "12px",
+            color: "hsl(var(--muted-foreground))",
+            marginBottom: "12px",
+          }}>
+            Community mood based on news and discussion articles
+          </p>
+          <SentimentChart seriesId={seriesData.id} />
+        </div>
+
+        {/* Latest News — coming soon */}
+        <div className="mt-16 w-full">
+          <div
+            className="border-4 border-foreground p-8 flex flex-col items-center justify-center text-center bg-background"
+            style={{ boxShadow: "6px 6px 0px hsl(var(--primary))" }}
+          >
+            <div className="w-full h-2 bg-primary mb-4" />
+            <h3 className="font-display text-xl uppercase tracking-widest text-foreground mb-2">
+              Latest News
+            </h3>
+            <p className="font-sans text-xs text-muted-foreground tracking-widest uppercase font-bold">
+              Articles about this series — coming soon
+            </p>
+          </div>
         </div>
       </div>
     </div>

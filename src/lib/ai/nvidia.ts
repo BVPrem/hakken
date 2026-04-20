@@ -14,23 +14,16 @@ export type ModelName = (typeof MODELS)[keyof typeof MODELS];
 
 // ─── Chat Completion ─────────────────────────────────────
 export async function chat(
-  prompt: string,
+  messages: Array<{ role: "user" | "assistant" | "system"; content: string }>,
   model: ModelName = MODELS.FAST,
-  systemMessage?: string
+  temperature: number = 0.6,
+  maxTokens: number = 4096
 ): Promise<string> {
   const apiKey = process.env.NVIDIA_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error("NVIDIA_API_KEY is not set");
   }
-
-  const messages: Array<{ role: string; content: string }> = [];
-  
-  if (systemMessage) {
-    messages.push({ role: "system", content: systemMessage });
-  }
-  
-  messages.push({ role: "user", content: prompt });
 
   try {
     const response = await axios.post(
@@ -38,8 +31,8 @@ export async function chat(
       {
         model,
         messages,
-        temperature: 0.6,
-        max_tokens: 4096,
+        temperature,
+        max_tokens: maxTokens,
         top_p: 0.95,
         stream: false,
       },
@@ -60,6 +53,20 @@ export async function chat(
     console.error("NVIDIA chat error:", error instanceof Error ? error.message : error);
     throw error;
   }
+}
+
+// Legacy single-prompt interface (backward compatible)
+export async function chatCompletion(
+  prompt: string,
+  model: ModelName = MODELS.FAST,
+  systemMessage?: string
+): Promise<string> {
+  const messages: Array<{ role: "user" | "assistant" | "system"; content: string }> = [];
+  if (systemMessage) {
+    messages.push({ role: "system", content: systemMessage });
+  }
+  messages.push({ role: "user", content: prompt });
+  return chat(messages, model);
 }
 
 // ─── Embedding Functions ────────────────────────────────
