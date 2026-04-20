@@ -123,30 +123,14 @@ export default async function HomePage() {
       {/* News Feed */}
       {feedArticles.length > 0 && (
         <section
-          className="border-t border-foreground/10 relative flex flex-col gap-6 md:gap-7"
-          style={{ marginTop: "56px", paddingTop: "56px" }}
+          className="border-t border-foreground/10 relative flex flex-col gap-7"
+          style={{ marginTop: "64px", paddingTop: "64px" }}
         >
           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
           </div>
-          <h2
-            style={{
-              fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: "20px",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "hsl(var(--foreground))",
-              borderLeft: "3px solid hsl(var(--primary))",
-              paddingLeft: "10px",
-              margin: 0,
-            }}
-          >
-            Latest News
-          </h2>
-          <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3
-              gap-4 md:gap-5 lg:gap-6"
-          >
+          <h2 className="section-heading" style={{ margin: 0 }}>Latest News</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
             {feedArticles.map((a) => (
               <NewsCard
                 key={a.id}
@@ -167,29 +151,14 @@ export default async function HomePage() {
 
       {/* Coming Soon */}
       <section
-        className="border-t border-foreground/10 relative flex flex-col gap-6 md:gap-7"
-        style={{ marginTop: "56px", paddingTop: "56px" }}
+        className="border-t border-foreground/10 relative flex flex-col gap-7"
+        style={{ marginTop: "64px", paddingTop: "64px" }}
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-4">
           <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
         </div>
-        <h2
-          style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "20px",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "hsl(var(--foreground))",
-            borderLeft: "3px solid hsl(var(--primary))",
-            paddingLeft: "10px",
-            margin: 0,
-          }}
-        >
-          Coming Soon
-        </h2>
-        <div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 lg:gap-6"
-        >
+        <h2 className="section-heading" style={{ margin: 0 }}>Coming Soon</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">
           <ComingSoonCards />
         </div>
       </section>

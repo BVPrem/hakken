@@ -84,12 +84,88 @@ FEEDS: list[Feed] = [
         "priority": 1,
     },
 
+    # ─── Series Subreddits ────────────────────────────────
+    {
+        "name": "Reddit r/OnePiece",
+        "url": "https://www.reddit.com/r/OnePiece/.rss?limit=25",
+        "source_id": "reddit_onepiece",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+    {
+        "name": "Reddit r/bleach",
+        "url": "https://www.reddit.com/r/bleach/.rss?limit=25",
+        "source_id": "reddit_bleach",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+    {
+        "name": "Reddit r/Naruto",
+        "url": "https://www.reddit.com/r/Naruto/.rss?limit=25",
+        "source_id": "reddit_naruto",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+    {
+        "name": "Reddit r/ShingekiNoKyojin",
+        "url": "https://www.reddit.com/r/ShingekiNoKyojin/.rss?limit=25",
+        "source_id": "reddit_aot",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+    {
+        "name": "Reddit r/JuJutsuKaisen",
+        "url": "https://www.reddit.com/r/JuJutsuKaisen/.rss?limit=25",
+        "source_id": "reddit_jjk",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+    {
+        "name": "Reddit r/DemonSlayerAnime",
+        "url": "https://www.reddit.com/r/DemonSlayerAnime/.rss?limit=25",
+        "source_id": "reddit_demonslayer",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+    {
+        "name": "Reddit r/HunterXHunter",
+        "url": "https://www.reddit.com/r/HunterXHunter/.rss?limit=25",
+        "source_id": "reddit_hxh",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+    {
+        "name": "Reddit r/DragonBallSuper",
+        "url": "https://www.reddit.com/r/DragonBallSuper/.rss?limit=25",
+        "source_id": "reddit_dbs",
+        "category": "community",
+        "language": "en",
+        "priority": 2,
+    },
+
     # ─── Release Trackers ─────────────────────────────────
     {
         "name": "Livechart.me",
         "url": "https://www.livechart.me/feeds/episodes",
         "source_id": "livechart",
         "category": "releases",
+        "language": "en",
+        "priority": 1,
+    },
+
+    # ─── Publisher / Official ──────────────────────���─────────
+    {
+        "name": "Crunchyroll News",
+        "url": "https://www.crunchyroll.com/news/rss",
+        "source_id": "crunchyroll_news",
+        "category": "news",
         "language": "en",
         "priority": 1,
     },

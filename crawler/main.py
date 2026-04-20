@@ -29,6 +29,7 @@ from db import (
     log_crawler_run,
 )
 from enricher import enrich_article
+from associate_series import run_association
 
 # ─── Logging setup ───────────────────────────────────────
 logging.basicConfig(
@@ -161,7 +162,15 @@ def run_crawler(max_enrich: int = 20) -> dict:
                 f"{article.get('title', '')[:50]}: {e}"
             )
 
-    # ─── Step 5: Log run ─────────────────────────────────
+    # ─── Step 5: Series association ────────────────────────────
+    logger.info("🔗 Step 5: Associating articles with series...")
+    try:
+        run_association()
+        logger.info("   ✅ Series association complete")
+    except Exception as e:
+        logger.error(f"   ❌ Association failed: {e}")
+
+    # ─── Step 7: Log run ─────────────────────────────────
     duration = (
         datetime.now(timezone.utc) - started_at
     ).total_seconds()
