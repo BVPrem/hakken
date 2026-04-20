@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(20, parseInt(searchParams.get("limit") ?? "12"));
   const source = searchParams.get("source");
   const sentiment = searchParams.get("sentiment");
+  const seriesId = searchParams.get("seriesId");
   const offset = (page - 1) * limit;
 
   const cacheKey = `feed:${page}:${limit}:${source ?? "all"}:${sentiment ?? "all"}`;
@@ -25,6 +26,10 @@ export async function GET(req: NextRequest) {
           articles.sentiment,
           sentiment as "positive" | "negative" | "neutral" | "mixed"
         )
+      );
+    if (seriesId)
+      conditions.push(
+        sql`${articles.relatedSeriesIds} @> ARRAY[${seriesId}]::text[]`
       );
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;

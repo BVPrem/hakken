@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { getAniListById, getStudio } from "@/lib/api/anilist";
 import { WatchlistButton } from "@/components/series/watchlist-button";
 import { SentimentChart } from "@/components/charts/sentiment-chart";
+import { LatestNews } from "@/components/series/latest-news";
 import {
   Star,
   Tv,
@@ -668,36 +669,7 @@ export default async function SeriesPage({ params }: PageProps) {
         {/* ── Latest News ── */}
         <div style={{ marginTop: "80px" }}>
           <h2 className="section-heading">Latest News</h2>
-          <div
-            className="bg-background relative overflow-hidden"
-            style={{
-              border: "2px solid hsl(var(--foreground)/0.18)",
-              boxShadow: "5px 5px 0 hsl(var(--primary)/0.12)",
-              padding: "56px 40px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-            }}
-          >
-            <div
-              className="absolute top-0 left-0 right-0 bg-primary"
-              style={{ height: "3px" }}
-            />
-            <div className="halftone absolute inset-0 opacity-20 pointer-events-none" />
-            <Layers
-              className="text-muted-foreground/30 relative z-10"
-              style={{ width: "36px", height: "36px", marginBottom: "16px" }}
-            />
-            <p
-              className="font-display uppercase relative z-10 text-muted-foreground"
-              style={{ fontSize: "13px", letterSpacing: "0.18em" }}
-            >
-              Articles about this series —{" "}
-              <span style={{ color: "hsl(var(--primary))" }}>Coming soon</span>
-            </p>
-          </div>
+          <LatestNews seriesId={id} />
         </div>
 
       </div>

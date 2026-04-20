@@ -1,25 +1,28 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import { db } from "@/lib/db";
-import { userSeries } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { userSeries, series } from "@/lib/db/schema";
+import { eq, desc, sql } from "drizzle-orm";
 import { UserButton } from "@clerk/nextjs";
+import { WatchlistButton } from "@/components/series/watchlist-button";
 
 const STATUS_LABELS: Record<string, string> = {
-  watching: "Watching",
-  completed: "Completed",
+  watching:      "Watching",
+  completed:     "Completed",
   plan_to_watch: "Plan to Watch",
-  on_hold: "On Hold",
-  dropped: "Dropped",
+  on_hold:       "On Hold",
+  dropped:       "Dropped",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  watching: "text-green-400",
-  completed: "text-blue-400",
-  plan_to_watch: "text-yellow-400",
-  on_hold: "text-orange-400",
-  dropped: "text-red-400",
+  watching:      "#22c55e",
+  completed:     "#3b82f6",
+  plan_to_watch: "#f59e0b",
+  on_hold:       "#f97316",
+  dropped:       "#ef4444",
 };
 
 export default async function ProfilePage() {
@@ -28,107 +31,367 @@ export default async function ProfilePage() {
 
   const user = await currentUser();
 
-  const stats = await db
+  // Full watchlist with series data
+  const watchlist = await db
     .select({
+      seriesId: userSeries.seriesId,
       status: userSeries.status,
-      count: sql<number>`count(*)`,
+      score: userSeries.score,
+      progress: userSeries.progress,
+      updatedAt: userSeries.updatedAt,
+      title: series.titleEn,
+      titleRomaji: series.titleRomaji,
+      coverImage: series.coverImage,
+      type: series.type,
+      episodeCount: series.episodeCount,
+      genres: series.genres,
     })
     .from(userSeries)
+    .leftJoin(series, eq(userSeries.seriesId, series.id))
     .where(eq(userSeries.userId, userId))
-    .groupBy(userSeries.status);
+    .orderBy(desc(userSeries.updatedAt));
 
-  const totalTracked = stats.reduce((sum, s) => sum + Number(s.count), 0);
+  // Stats by status
+  const stats = Object.fromEntries(
+    Object.keys(STATUS_LABELS).map(k => [
+      k,
+      watchlist.filter(w => w.status === k).length,
+    ])
+  );
+  const totalTracked = watchlist.length;
 
-  const recent = await db
-    .select()
-    .from(userSeries)
-    .where(eq(userSeries.userId, userId))
-    .orderBy(userSeries.updatedAt)
-    .limit(5);
+  // Genre breakdown for radar
+  const genreCount: Record<string, number> = {};
+  watchlist.forEach(w => {
+    (w.genres ?? []).forEach(g => {
+      genreCount[g] = (genreCount[g] ?? 0) + 1;
+    });
+  });
+  const topGenres = Object.entries(genreCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
 
   const displayName =
     user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
       : user?.firstName ?? user?.username ?? "Anime Fan";
 
-  return (
-    <div className="flex flex-col gap-8 max-w-3xl halftone min-h-screen">
-      <div className="chapter-marker">
-        <h1 className="font-display text-3xl uppercase tracking-wider text-foreground">
-          Profile
-        </h1>
-      </div>
+  const SectionHeader = ({ children }: {
+    children: React.ReactNode
+  }) => (
+    <h2 style={{
+      fontFamily: "'Bebas Neue', sans-serif",
+      fontSize: "18px",
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      color: "hsl(var(--foreground))",
+      borderLeft: "3px solid hsl(var(--primary))",
+      paddingLeft: "10px",
+      margin: 0,
+    }}>
+      {children}
+    </h2>
+  );
 
-      <div className="flex items-center gap-5 glass p-6">
-        <UserButton
-          appearance={{
-            elements: { avatarBox: "w-16 h-16" },
-          }}
-        />
+  return (
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "36px",
+      maxWidth: "900px",
+    }}>
+
+      {/* Profile header */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "20px",
+        padding: "24px",
+        background: "var(--glass-bg)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1.5px solid var(--glass-border)",
+      }}>
+        <UserButton appearance={{
+          elements: { avatarBox: "w-16 h-16" },
+        }} />
         <div>
-          <h2 className="font-display text-xl uppercase tracking-wider text-foreground">
+          <h1 style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: "28px",
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+            color: "hsl(var(--foreground))",
+            margin: 0, lineHeight: 1,
+          }}>
             {displayName}
-          </h2>
-          <p className="text-muted-foreground text-sm mt-0.5">
+          </h1>
+          <p style={{
+            fontSize: "12px",
+            color: "hsl(var(--muted-foreground))",
+            margin: "4px 0 0",
+          }}>
             {user?.primaryEmailAddress?.emailAddress}
           </p>
-          <p className="text-muted-foreground text-sm mt-1">
-            {totalTracked} series tracked
+          <p style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: "11px",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            color: "hsl(var(--primary))",
+            margin: "6px 0 0",
+          }}>
+            {totalTracked} Series Tracked
           </p>
         </div>
       </div>
 
-      {stats.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-          {Object.entries(STATUS_LABELS).map(([key, label]) => {
-            const stat = stats.find((s) => s.status === key);
-            const count = stat ? Number(stat.count) : 0;
-            return (
-              <div
-                key={key}
-                className="manga-panel-thin bg-card p-3 flex flex-col gap-1 text-center"
-              >
-                <span className={`text-xl font-display ${STATUS_COLORS[key]}`}>
-                  {count}
-                </span>
-                <span className="text-[10px] text-muted-foreground font-display uppercase tracking-wide">{label}</span>
-              </div>
-            );
-          })}
+      {/* Stats */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <SectionHeader>Stats</SectionHeader>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+          gap: "10px",
+          marginTop: "8px",
+        }}>
+          {Object.entries(STATUS_LABELS).map(([key, label]) => (
+            <div
+              key={key}
+              style={{
+                padding: "16px",
+                background: "var(--glass-bg)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1.5px solid var(--glass-border)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                textAlign: "center",
+              }}
+            >
+              <span style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "28px",
+                color: STATUS_COLORS[key],
+                lineHeight: 1,
+              }}>
+                {stats[key] ?? 0}
+              </span>
+              <span style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "9px",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "hsl(var(--muted-foreground))",
+              }}>
+                {label}
+              </span>
+            </div>
+          ))}
         </div>
-      ) : (
-        <div className="manga-panel bg-card p-8 text-center">
-          <p className="text-muted-foreground">
-            No series tracked yet.{" "}
-            <a href="/search" className="text-primary hover:underline">
-              Start exploring
-            </a>
-          </p>
-        </div>
-      )}
+      </div>
 
-      {recent.length > 0 && (
-        <div className="flex flex-col gap-3 chapter-marker">
-          <h3 className="font-display text-lg uppercase tracking-wider text-foreground">
-            Recent Activity
-          </h3>
-          <div className="flex flex-col gap-2">
-            {recent.map((entry) => (
+      {/* Genre taste */}
+      {topGenres.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <SectionHeader>Your Taste</SectionHeader>
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "8px",
+            marginTop: "8px",
+          }}>
+            {topGenres.map(([genre, count]) => (
               <div
-                key={entry.seriesId}
-                className="flex items-center justify-between manga-panel-thin bg-card px-4 py-3"
+                key={genre}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "4px 10px",
+                  background: "hsl(var(--primary) / 0.08)",
+                  border: "1px solid hsl(var(--primary) / 0.2)",
+                }}
               >
-                <span className="text-sm text-foreground font-medium truncate max-w-xs">
-                  {entry.seriesId.replace("anilist-", "Series ")}
+                <span style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "11px",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "hsl(var(--foreground))",
+                }}>
+                  {genre}
                 </span>
-                <span className={`text-xs font-display uppercase tracking-wide ${STATUS_COLORS[entry.status]}`}>
-                  {STATUS_LABELS[entry.status]}
+                <span style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "10px",
+                  color: "hsl(var(--primary))",
+                }}>
+                  {count}
                 </span>
               </div>
             ))}
           </div>
         </div>
       )}
+
+      {/* Watchlist */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <SectionHeader>
+          Watchlist ({totalTracked})
+        </SectionHeader>
+
+        {totalTracked === 0 ? (
+          <div style={{
+            padding: "40px 20px",
+            textAlign: "center",
+            background: "var(--glass-bg)",
+            border: "1.5px solid var(--glass-border)",
+            marginTop: "8px",
+          }}>
+            <p style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: "13px",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "hsl(var(--muted-foreground))",
+              margin: "0 0 8px",
+            }}>
+              Nothing tracked yet
+            </p>
+            <Link
+              href="/search"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "11px",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "hsl(var(--primary))",
+                textDecoration: "none",
+              }}
+            >
+              Explore Series →
+            </Link>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1px", marginTop: "8px" }}>
+            {watchlist.map((w) => (
+              <div
+                key={w.seriesId}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "10px 14px",
+                  background: "var(--glass-bg)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                  border: "1px solid var(--glass-border)",
+                  transition: "background 0.15s",
+                }}
+              >
+                {/* Cover thumbnail */}
+                <Link href={`/series/${w.seriesId}`}>
+                  <div style={{
+                    width: "36px", height: "54px",
+                    flexShrink: 0, overflow: "hidden",
+                    border: "1px solid var(--glass-border)",
+                  }}>
+                    {w.coverImage ? (
+                      <Image
+                        src={w.coverImage}
+                        alt={w.title ?? ""}
+                        width={36}
+                        height={54}
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: "100%", height: "100%",
+                        background: "hsl(var(--muted))",
+                      }} />
+                    )}
+                  </div>
+                </Link>
+
+                {/* Title + type */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Link
+                    href={`/series/${w.seriesId}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <p style={{
+                      margin: 0,
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: "13px",
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      color: "hsl(var(--foreground))",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}>
+                      {w.title ?? w.titleRomaji
+                        ?? w.seriesId}
+                    </p>
+                  </Link>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    marginTop: "2px",
+                  }}>
+                    <span style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: "9px",
+                      letterSpacing: "0.15em",
+                      textTransform: "uppercase",
+                      color: "hsl(var(--muted-foreground))",
+                    }}>
+                      {w.type}
+                    </span>
+                    {w.episodeCount && (
+                      <span style={{
+                        fontSize: "9px",
+                        color: "hsl(var(--muted-foreground))",
+                      }}>
+                        · {w.progress ?? 0}/
+                        {w.episodeCount} ep
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status badge */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  flexShrink: 0,
+                }}>
+                  <span style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "9px",
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    color: STATUS_COLORS[w.status],
+                    background: `${STATUS_COLORS[w.status]}18`,
+                    padding: "2px 8px",
+                    border: `1px solid ${STATUS_COLORS[w.status]}40`,
+                  }}>
+                    {STATUS_LABELS[w.status]}
+                  </span>
+                  <WatchlistButton
+                    seriesId={w.seriesId}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
