@@ -63,6 +63,7 @@
     color: hsl(var(--foreground));
     font-family: 'Space Grotesk', sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -153,6 +154,35 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* ── Section heading (manga chapter style) ── */
+  .section-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: hsl(var(--foreground));
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-heading::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 1.4em;
+    background: hsl(var(--primary));
+    flex-shrink: 0;
+  }
+  .section-heading::after {
+    content: '';
+    display: block;
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, hsl(var(--foreground) / 0.15), transparent);
+  }
+
 }
 
 /* Glass variables — outside @layer for guaranteed cascade */
