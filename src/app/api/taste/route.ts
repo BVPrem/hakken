@@ -18,9 +18,9 @@ export async function GET(req: NextRequest) {
     { error: "Unauthorized" }, { status: 401 }
   );
 
-  const bust = req.nextUrl.searchParams.get("bust");
+  const shouldRefresh = req.nextUrl.searchParams.get("refresh") === "1";
   const cacheKey = `taste:${userId}`;
-  const cached = !bust ? await getCached(cacheKey) : null;
+  const cached = !shouldRefresh ? await getCached(cacheKey) : null;
   if (cached) return NextResponse.json(cached);
 
   try {
@@ -101,24 +101,32 @@ export async function GET(req: NextRequest) {
         model: "meta/llama-3.1-8b-instruct",
         messages: [{
           role: "user",
-          content: `You are an anime taste analyst for the Hakken platform.
-Analyse this user's anime/manga watching history and write a personalised taste profile.
+          content: `You are an anime taste analyst on Hakken.
+Write a SPECIFIC, personalised taste profile.
+Use the exact data provided — names, numbers, genres.
+Do NOT be generic. Do NOT use phrases like
+"epic adventures" or "compelling stories" without
+being specific about why.
 
-Their data:
-- Top genres: ${topGenres || "Not enough data"}
-- Favourite studios: ${topStudios || "Various"}
-- Completed: ${completedTitles || "Nothing completed yet"}
-- Total tracked: ${watchlist.length} series
-- Completed: ${statusData.find(s => s.status === "completed")?.count ?? 0}
-- Watching: ${statusData.find(s => s.status === "watching")?.count ?? 0}
+ACTUAL DATA:
+- Top genres (in order): ${topGenres}
+- Studios they watch: ${topStudios || "Various"}
+- Series they completed: ${completedTitles || "None yet"}
+- Total tracked: ${watchlist.length}
+- Completion rate: ${statusData.find(s => s.status === "completed")?.count ?? 0}/${watchlist.length}
 
-Write exactly 3 sentences:
-1. Their core taste archetype (e.g. "You're a dark fantasy devotee who...")
-2. What they value in storytelling based on their genres
-3. One specific prediction about what they'll love next
+Write exactly 3 sentences. Each MUST reference
+specific data from above (genre names, studio names,
+or series titles). No generic phrases.
 
-Be specific, insightful and enthusiastic. Use second person (you/your).
-No bullet points. Just 3 flowing sentences.`,
+Sentence 1: Their specific taste archetype using
+  their actual top genres
+Sentence 2: What their completed series reveal about
+  what they value (reference actual titles if available)
+Sentence 3: A specific prediction with a real series
+  recommendation they'll love next
+
+Second person (you/your). No bullet points.`,
         }],
         max_tokens: 200,
         temperature: 0.8,

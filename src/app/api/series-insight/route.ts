@@ -24,7 +24,8 @@ export async function GET(req: NextRequest) {
   );
 
   const cacheKey = `insight:${userId}:${seriesId}`;
-  const cached = await getCached(cacheKey);
+  const shouldRefresh = req.nextUrl.searchParams.get("refresh") === "1";
+  const cached = !shouldRefresh ? await getCached(cacheKey) : null;
   if (cached) return NextResponse.json(cached);
 
   try {
@@ -64,21 +65,31 @@ export async function GET(req: NextRequest) {
         messages: [{
           role: "user",
           content: `You are an anime analyst on Hakken.
-Generate a personalised insight for a user viewing this series page.
+Generate a personalised insight for a user viewing
+this series page. Be SPECIFIC — reference actual
+data points, not generic observations.
 
 Series: ${title}
 Genres: ${(seriesData.genres ?? []).join(", ")}
 Status: ${seriesData.status}
-Score: ${seriesData.averageScore ?? "N/A"}
-Episodes: ${seriesData.episodeCount ?? "unknown"}
-User's taste: ${userGenres.join(", ") || "Unknown"}
+Score: ${seriesData.averageScore ?? "No score yet"}
+Episodes: ${seriesData.episodeCount ?? "Unknown"}
+Studio: ${(seriesData.studios as string[] ?? []).join(", ") || "Unknown"}
+Season: ${seriesData.season ?? ""} ${seriesData.seasonYear ?? ""}
+User taste profile: ${userGenres.join(", ") || "Unknown — no watchlist yet"}
 
-Respond ONLY with this exact JSON, no other text:
+RULES:
+- match field: MUST mention specific genres or score
+- community_mood: MUST reference the actual score number
+- verdict: Base on score (>8.5=MUST_WATCH, 7-8.5=WORTH_IT, <7=NICHE_PICK)
+- verdict_reason: Must be specific to THIS series
+
+Respond ONLY with exact JSON, no other text:
 {
-  "match": "One sentence on why this fits (or doesn't fit) the user's taste. Be specific.",
-  "community_mood": "One sentence summarising community reception based on the score and status.",
-  "verdict": "MUST_WATCH" | "WORTH_IT" | "NICHE_PICK" | "SKIP_IT",
-  "verdict_reason": "One sentence explaining the verdict (max 15 words)"
+  "match": "Specific sentence mentioning actual genre overlap or contrast with user taste",
+  "community_mood": "Sentence using the actual score (${seriesData.averageScore ?? 'unrated'}) and status",
+  "verdict": "${(seriesData.averageScore ?? 0) >= 8.5 ? "MUST_WATCH" : (seriesData.averageScore ?? 0) >= 7 ? "WORTH_IT" : "NICHE_PICK"}",
+  "verdict_reason": "One specific reason for this verdict (max 15 words)"
 }`,
         }],
         max_tokens: 200,

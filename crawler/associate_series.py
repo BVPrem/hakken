@@ -19,7 +19,6 @@ logger = logging.getLogger("associate")
 
 
 def normalize(text: str) -> str:
-    """Lowercase, strip punctuation, collapse whitespace."""
     if not text:
         return ""
     text = text.lower()
@@ -28,11 +27,37 @@ def normalize(text: str) -> str:
     return text
 
 
+def get_name_variants(name: str) -> list[str]:
+    """
+    Generate strict match variants of a series name.
+    Only exact title matches — NO tag matching.
+    """
+    n = normalize(name)
+    if not n or len(n) < 4:
+        return []
+
+    variants = [n]
+
+    # Common subtitle patterns to also try
+    # e.g. "attack on titan final season" -> also try
+    # "attack on titan"
+    for suffix in [
+        " final season", " season 2", " season 3",
+        " part 2", " part 1", " the movie",
+        " ova", " special", ": the",
+    ]:
+        if n.endswith(suffix):
+            variants.append(n[: -len(suffix)].strip())
+
+    # Only return variants with 4+ chars
+    return [v for v in variants if len(v) >= 4]
+
+
 def build_series_index(conn) -> list[dict]:
     """Load all series from DB and build a lookup index."""
     with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
         cur.execute("""
-            SELECT id, title_en, title_romaji, title_ja, tags
+            SELECT id, title_en, title_romaji
             FROM series
             WHERE title_en IS NOT NULL
                OR title_romaji IS NOT NULL
@@ -44,15 +69,11 @@ def build_series_index(conn) -> list[dict]:
         names = []
         for field in [row["title_en"], row["title_romaji"]]:
             if field:
-                names.append(normalize(field))
-                parts = normalize(field).split()
-                if len(parts) >= 3:
-                    names.append(" ".join(parts[:3]))
-
-        index.append({
-            "id": row["id"],
-            "names": [n for n in names if len(n) >= 3],
-        })
+                for v in get_name_variants(field):
+                    if v not in names:
+                        names.append(v)
+        if names:
+            index.append({"id": row["id"], "names": names})
 
     logger.info(f"Loaded {len(index)} series into index")
     return index
@@ -61,34 +82,30 @@ def build_series_index(conn) -> list[dict]:
 def match_article_to_series(
     article: dict,
     series_index: list[dict],
-    min_name_length: int = 4
 ) -> list[str]:
     """
-    Return list of series IDs that match this article.
-    Matches against article title + summary + tags.
+    STRICT matching: only match on article TITLE.
+    Never match on tags or summary alone.
+    Requires the series name to appear as a word-boundary
+    match in the article title.
     """
-    searchable_parts = []
-    if article.get("title"):
-        searchable_parts.append(normalize(article["title"]))
-    if article.get("summary"):
-        searchable_parts.append(normalize(article["summary"][:500]))
-    if article.get("tags"):
-        for tag in (article["tags"] or []):
-            searchable_parts.append(normalize(tag))
-
-    searchable = " ".join(searchable_parts)
-    if not searchable.strip():
+    title = normalize(article.get("title", ""))
+    if not title or len(title) < 5:
         return []
 
     matched_ids = []
     for series in series_index:
+        matched = False
         for name in series["names"]:
-            if len(name) < min_name_length:
+            if len(name) < 5:
                 continue
+            # Strict: word boundary match in title ONLY
             pattern = r"\b" + re.escape(name) + r"\b"
-            if re.search(pattern, searchable):
-                matched_ids.append(series["id"])
+            if re.search(pattern, title):
+                matched = True
                 break
+        if matched:
+            matched_ids.append(series["id"])
 
     return matched_ids
 

@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { series } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getAniListById, getStudio } from "@/lib/api/anilist";
+import { getFullEnrichment } from "@/lib/api/jikan-enrich";
+import { getCached, setCached } from "@/lib/redis";
 import { WatchlistButton } from "@/components/series/watchlist-button";
 import { SeriesInsight } from "@/components/series/series-insight";
 import { SentimentChart } from "@/components/charts/sentiment-chart";
@@ -109,6 +111,33 @@ export default async function SeriesPage({ params }: PageProps) {
     seriesData.titleRomaji ??
     seriesData.titleJa ??
     "Unknown";
+
+  // Try to get Jikan enrichment using title search
+  let enrichment = null;
+  if (seriesData.type === "anime" && displayTitle && displayTitle !== "Unknown") {
+    try {
+      // Search Jikan for MAL ID
+      const searchKey = `jikan-search:${displayTitle}`;
+      let malId = await getCached<number>(searchKey);
+      if (!malId) {
+        const jikanSearch = await fetch(
+          `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(displayTitle)}&limit=1`,
+          { next: { revalidate: 86400 } }
+        );
+        if (jikanSearch.ok) {
+          const searchData = await jikanSearch.json();
+          const results = searchData.data ?? [];
+          if (results.length > 0) {
+            malId = results[0].mal_id;
+            await setCached(searchKey, malId, 604800);
+          }
+        }
+      }
+      if (malId) {
+        enrichment = await getFullEnrichment(malId).catch(() => null);
+      }
+    } catch {}
+  }
 
   const isAiring = seriesData.status === "RELEASING";
   const statusLabel = isAiring
@@ -677,6 +706,176 @@ export default async function SeriesPage({ params }: PageProps) {
           <h2 className="section-heading">Latest News</h2>
           <LatestNews seriesId={id} />
         </div>
+
+        {/* ── Filler Guide ── */}
+        {enrichment && enrichment.fillerEpisodes.length > 0 && (
+          <div className="mt-8 max-w-4xl">
+            <h2 style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: "18px",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "hsl(var(--foreground))",
+              borderLeft: "3px solid hsl(var(--primary))",
+              paddingLeft: "10px",
+              margin: "0 0 12px 0",
+            }}>
+              Filler Guide
+            </h2>
+            <div style={{
+              padding: "16px",
+              background: "var(--glass-bg)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              border: "1.5px solid var(--glass-border)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+            }}>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}>
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}>
+                  <div style={{
+                    width: "10px", height: "10px",
+                    background: "hsl(var(--primary))",
+                    borderRadius: "50%",
+                  }} />
+                  <span style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "11px",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "hsl(var(--foreground))",
+                  }}>
+                    {enrichment.fillerEpisodes.length} filler
+                    episodes
+                  </span>
+                </div>
+                {enrichment.recapEpisodes.length > 0 && (
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}>
+                    <div style={{
+                      width: "10px", height: "10px",
+                      background: "#f59e0b",
+                      borderRadius: "50%",
+                    }} />
+                    <span style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: "11px",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "hsl(var(--foreground))",
+                    }}>
+                      {enrichment.recapEpisodes.length} recap
+                      episodes
+                    </span>
+                  </div>
+                )}
+              </div>
+              {enrichment.fillerEpisodes.length > 0 &&
+               enrichment.fillerEpisodes.length <= 200 && (
+                <p style={{
+                  margin: 0,
+                  fontSize: "12px",
+                  color: "hsl(var(--muted-foreground))",
+                  lineHeight: 1.6,
+                }}>
+                  <span style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "10px",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "hsl(var(--muted-foreground))",
+                  }}>
+                    Skip episodes:{" "}
+                  </span>
+                  {enrichment.fillerEpisodes.join(", ")}
+                </p>
+              )}
+              <p style={{
+                margin: 0,
+                fontSize: "11px",
+                color: "hsl(var(--muted-foreground))",
+                fontStyle: "italic",
+              }}>
+                Ask Hakken AI for a full spoiler-free
+                watch order with context on each arc.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Top Characters ── */}
+        {enrichment && enrichment.topCharacters.length > 0 && (
+          <div className="mt-6 max-w-4xl">
+            <h2 style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: "18px",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "hsl(var(--foreground))",
+              borderLeft: "3px solid hsl(var(--primary))",
+              paddingLeft: "10px",
+              margin: "0 0 12px 0",
+            }}>
+              Top Characters
+            </h2>
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+            }}>
+              {enrichment.topCharacters.map(char => (
+                <div
+                  key={char.name}
+                  style={{
+                    padding: "6px 12px",
+                    background: "var(--glass-bg)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    border: "1px solid var(--glass-border)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "2px",
+                    minWidth: "100px",
+                  }}
+                >
+                  <span style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "11px",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "hsl(var(--foreground))",
+                  }}>
+                    {char.name}
+                  </span>
+                  <span style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "9px",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: char.role === "Main"
+                      ? "hsl(var(--primary))"
+                      : "hsl(var(--muted-foreground))",
+                  }}>
+                    {char.role}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </article>

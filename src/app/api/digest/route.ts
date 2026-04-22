@@ -22,7 +22,9 @@ export async function GET(req: NextRequest) {
   const now = new Date();
   const weekKey = `${now.getFullYear()}-W${Math.ceil(now.getDate() / 7)}`;
   const cacheKey = `digest:${userId}:${weekKey}`;
-  const cached = await getCached(cacheKey);
+  
+  const shouldRefresh = req.nextUrl.searchParams.get("refresh") === "1";
+  const cached = !shouldRefresh ? await getCached(cacheKey) : null;
   if (cached) return NextResponse.json(cached);
 
   try {
@@ -74,27 +76,44 @@ export async function GET(req: NextRequest) {
         model: "meta/llama-3.1-8b-instruct",
         messages: [{
           role: "user",
-          content: `You are writing a weekly anime digest for a fan on Hakken.
+          content: `You are the Hakken AI writing a weekly anime digest.
+You MUST use specific, real data provided. Do not add
+generic filler. If you don't have specific data for a
+field, say so honestly rather than being vague.
 
-User's favourite genres: ${genreStr}
-Currently watching: ${watchingTitles || "nothing yet"}
-Trending this week: ${trendingNames}
-Recent news headlines:
+DATA AVAILABLE:
+Currently airing series (by popularity):
+${trending.map((t, i) => `${i+1}. ${t.titleEn} (popularity: ${t.popularity})`).join("\n")}
+
+Recent news headlines this week:
 ${newsHeadlines}
 
-Write a SHORT weekly digest with EXACTLY this JSON structure, no other text:
+User's currently watching:
+${watchingTitles || "Nothing tracked yet"}
+
+User's favourite genres:
+${genreStr}
+
+RULES:
+1. trending_pick MUST be one of the series listed above
+2. news_summary MUST reference a specific headline above
+3. recommendation MUST be based on the user's genres
+4. fun_fact must be a specific verifiable fact
+5. greeting must reference something from the data
+
+Respond ONLY with this exact JSON:
 {
-  "greeting": "One punchy opening line (max 12 words)",
+  "greeting": "One specific sentence referencing real data (max 15 words)",
   "trending_pick": {
-    "title": "Best trending series to watch this week",
-    "reason": "One sentence why (max 20 words)"
+    "title": "EXACT name from the trending list above",
+    "reason": "Specific reason based on news or popularity data (max 20 words)"
   },
-  "news_summary": "One sentence summarising the biggest anime news this week (max 25 words)",
+  "news_summary": "Specific headline reference - name the actual show and event (max 25 words)",
   "recommendation": {
-    "title": "One series recommendation based on their genres",
-    "reason": "One sentence why (max 20 words)"
+    "title": "Real anime matching user genres: ${genreStr}",
+    "reason": "Specific reason tied to their genre preference (max 20 words)"
   },
-  "fun_fact": "One interesting anime/manga fact or trivia (max 20 words)"
+  "fun_fact": "Specific verifiable anime fact with a number or name (max 20 words)"
 }`,
         }],
         max_tokens: 400,
