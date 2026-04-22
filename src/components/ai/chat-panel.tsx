@@ -12,9 +12,11 @@ interface Message {
 
 const SUGGESTED_PROMPTS = [
   "What should I watch next?",
+  "Give me a watch order for One Piece",
+  "Which episodes of Naruto can I skip?",
   "What's trending in anime right now?",
   "Catch me up on recent anime news",
-  "Recommend something like Attack on Titan",
+  "Compare Attack on Titan and Vinland Saga",
 ];
 
 export function ChatPanel() {

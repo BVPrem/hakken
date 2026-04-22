@@ -6,6 +6,7 @@ import { series } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getAniListById, getStudio } from "@/lib/api/anilist";
 import { WatchlistButton } from "@/components/series/watchlist-button";
+import { SeriesInsight } from "@/components/series/series-insight";
 import { SentimentChart } from "@/components/charts/sentiment-chart";
 import { LatestNews } from "@/components/series/latest-news";
 import {
@@ -273,6 +274,11 @@ export default async function SeriesPage({ params }: PageProps) {
             {/* Watchlist */}
             <div style={{ width: "100%" }}>
               <WatchlistButton seriesId={id} />
+            </div>
+            
+            {/* AI Insight */}
+            <div style={{ width: "100%", marginTop: "16px" }}>
+              <SeriesInsight seriesId={id} />
             </div>
           </div>
 

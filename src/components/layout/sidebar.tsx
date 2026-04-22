@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion"; // still used for active bar animation
-import { Home, Search, Compass, Users, User } from "lucide-react";
+import { Home, Search, Compass, Users, User, Dna } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "./theme-toggle";
@@ -12,6 +12,7 @@ const navItems = [
   { href: "/",         label: "Home",     icon: Home    },
   { href: "/search",   label: "Search",   icon: Search  },
   { href: "/discover", label: "Discover", icon: Compass },
+  { href: "/taste",     label: "Taste DNA", icon: Dna     },
   { href: "/friends",  label: "Friends",  icon: Users   },
   { href: "/profile",  label: "Profile",  icon: User    },
 ];

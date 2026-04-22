@@ -5,6 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import { SeriesCarousel } from "@/components/series/series-carousel";
 import { NewsCard } from "@/components/feed/news-card";
 import { ComingSoonCards } from "@/components/ui/coming-soon-cards";
+import { WeeklyDigest } from "@/components/digest/weekly-digest";
 
 export default async function HomePage() {
   const user = await currentUser();
@@ -74,6 +75,11 @@ export default async function HomePage() {
         >
           発見
         </div>
+      </div>
+
+      {/* Weekly Digest */}
+      <div style={{ marginTop: "24px", maxWidth: "900px" }}>
+        <WeeklyDigest />
       </div>
 
       {/* Trending carousel */}
