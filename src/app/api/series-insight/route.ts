@@ -36,7 +36,42 @@ export async function GET(req: NextRequest) {
       .where(eq(series.id, seriesId))
       .limit(1);
 
-    const seriesData = seriesRows[0];
+    let seriesData = seriesRows[0] ?? null;
+
+    // Fallback: fetch from AniList if not in DB
+    if (!seriesData && seriesId.startsWith("anilist-")) {
+      const anilistId = parseInt(
+        seriesId.replace("anilist-", "")
+      );
+      if (!isNaN(anilistId)) {
+        try {
+          const { getAniListById, getTitle, getStudio }
+            = await import("@/lib/api/anilist");
+          const aniData = await getAniListById(anilistId);
+          if (aniData) {
+            seriesData = {
+              id: seriesId,
+              titleEn: aniData.title.english,
+              titleRomaji: aniData.title.romaji,
+              genres: aniData.genres,
+              studios: getStudio(aniData)
+                ? [getStudio(aniData)!] : [],
+              averageScore: aniData.averageScore
+                ? aniData.averageScore / 10 : null,
+              episodeCount: aniData.episodes,
+              status: aniData.status,
+              season: aniData.season,
+              seasonYear: aniData.seasonYear,
+              type: aniData.type === "ANIME"
+                ? "anime" : "manga",
+            } as any;
+          }
+        } catch (e) {
+          console.error("AniList fallback failed:", e);
+        }
+      }
+    }
+
     if (!seriesData) return NextResponse.json(
       { error: "Series not found" }, { status: 404 }
     );

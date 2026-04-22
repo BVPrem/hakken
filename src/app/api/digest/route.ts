@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   // Cache with weekly TTL keyed by userId
   const now = new Date();
   const weekKey = `${now.getFullYear()}-W${Math.ceil(now.getDate() / 7)}`;
-  const cacheKey = `digest:${userId}:${weekKey}`;
+   const cacheKey = `digest:${userId}:${weekKey}:v2`;
   
   const shouldRefresh = req.nextUrl.searchParams.get("refresh") === "1";
   const cached = !shouldRefresh ? await getCached(cacheKey) : null;
@@ -44,27 +44,39 @@ export async function GET(req: NextRequest) {
       watchlist.flatMap(w => w.genres ?? [])
     )].slice(0, 5);
 
-    // Get trending series
-    const trending = await db
-      .select({ titleEn: series.titleEn,
-                popularity: series.popularity })
-      .from(series)
-      .where(eq(series.status, "RELEASING"))
-      .orderBy(desc(series.popularity))
-      .limit(5);
+     // Get trending series
+     const trending = await db
+       .select({
+         titleEn: series.titleEn,
+         popularity: series.popularity,
+         status: series.status,
+         seasonYear: series.seasonYear,
+       })
+       .from(series)
+       .where(eq(series.status, "RELEASING"))
+       .orderBy(desc(series.popularity))
+       .limit(10);
 
-    // Get latest news headlines
-    const news = await db
-      .select({ title: articles.title,
-                source: articles.source })
-      .from(articles)
-      .orderBy(desc(articles.publishedAt))
-      .limit(10);
+     // Get latest news headlines
+     const news = await db
+       .select({
+         title: articles.title,
+         source: articles.source,
+         publishedAt: articles.publishedAt,
+       })
+       .from(articles)
+       .orderBy(desc(articles.publishedAt))
+       .limit(20);
 
-    const trendingNames = trending
-      .map(t => t.titleEn).filter(Boolean).join(", ");
-    const newsHeadlines = news
-      .map(n => `- ${n.title}`).join("\n");
+     const trendingNames = trending
+       .map((t, i) =>
+         `${i+1}. ${t.titleEn} (${t.seasonYear ?? "ongoing"})`
+       )
+       .filter(t => t.includes("null") === false)
+       .join("\n");
+     const newsHeadlines = news
+       .map(n => `- [${n.source}] ${n.title}`)
+       .join("\n");
     const genreStr = userGenres.join(", ")
       || "action, adventure";
     const watchingTitles = watchlist
@@ -94,12 +106,12 @@ ${watchingTitles || "Nothing tracked yet"}
 User's favourite genres:
 ${genreStr}
 
-RULES:
-1. trending_pick MUST be one of the series listed above
-2. news_summary MUST reference a specific headline above
-3. recommendation MUST be based on the user's genres
-4. fun_fact must be a specific verifiable fact
-5. greeting must reference something from the data
+ RULES:
+ 1. trending_pick MUST be one of the series listed above
+ 2. news_summary MUST reference a specific headline above, including the source in brackets (e.g., [ANN] Title)
+ 3. recommendation MUST be based on the user's genres
+ 4. fun_fact must be a specific verifiable fact
+ 5. greeting must reference something from the data
 
 Respond ONLY with this exact JSON:
 {

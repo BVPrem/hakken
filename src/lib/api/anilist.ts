@@ -60,27 +60,39 @@ export interface AniListMedia {
   trailer: { id: string; site: string } | null;
 }
 
-// ─── Shared media fragment ────────────────────────────────
-const MEDIA_FRAGMENT = `
-  id
-  title { english romaji native }
-  type format status
-  description(asHtml: false)
-  startDate { year month day }
-  endDate { year month day }
-  season seasonYear
-  episodes chapters volumes
-  coverImage { large extraLarge color }
-  bannerImage
-  genres
-  tags { name rank isMediaSpoiler }
-  studios { nodes { id name isAnimationStudio } }
-  averageScore meanScore popularity trending favourites
-  nextAiringEpisode { airingAt timeUntilAiring episode }
-  isAdult siteUrl
-  idMal
-  trailer { id site }
-`;
+ // ─── Shared media fragment ────────────────────────────────
+ const MEDIA_FRAGMENT = `
+   id
+   title { english romaji native }
+   type format status
+   description(asHtml: false)
+   startDate { year month day }
+   endDate { year month day }
+   season seasonYear
+   episodes chapters volumes
+   coverImage { large extraLarge color }
+   bannerImage
+   genres
+   tags { name rank isMediaSpoiler }
+   studios { nodes { id name isAnimationStudio } }
+   averageScore meanScore popularity trending favourites
+   nextAiringEpisode { airingAt timeUntilAiring episode }
+   isAdult siteUrl
+   idMal
+   trailer { id site }
+   relations {
+     edges {
+       relationType
+       node {
+         id
+         title { english romaji }
+         type
+         format
+         startDate { year }
+       }
+     }
+   }
+ `;
 
 // ─── Get trending anime ───────────────────────────────────
 export async function getTrendingAnime(
