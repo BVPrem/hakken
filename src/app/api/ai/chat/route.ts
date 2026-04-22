@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { userSeries, series, articles } from "@/lib/db/schema";
- import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import OpenAI from "openai";
 
 const nvidia = new OpenAI({
