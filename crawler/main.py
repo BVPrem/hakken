@@ -16,6 +16,7 @@ Run on Lambda: handler() is the entrypoint
 """
 
 import logging
+import os
 import uuid
 from datetime import datetime, timezone
 
@@ -30,6 +31,9 @@ from db import (
 )
 from enricher import enrich_article
 from associate_series import run_association
+
+# Read ENRICH_LIMIT from environment
+ENRICH_LIMIT = int(os.environ.get("ENRICH_LIMIT", "20"))
 
 # ─── Logging setup ───────────────────────────────────────
 logging.basicConfig(
@@ -211,13 +215,13 @@ def run_crawler(max_enrich: int = 20) -> dict:
 # ─── Lambda entrypoint ───────────────────────────────────
 def handler(event=None, context=None):
     """AWS Lambda handler — same as run_crawler()."""
-    result = run_crawler()
+    result = run_crawler(max_enrich=ENRICH_LIMIT)
     return {"statusCode": 200, "body": result}
 
 
 # ─── Local execution ─────────────────────────────────────
 if __name__ == "__main__":
-    result = run_crawler(max_enrich=10)
+    result = run_crawler(max_enrich=ENRICH_LIMIT)
     print("\n📊 Run Summary:")
     for key, value in result.items():
         print(f"   {key}: {value}")

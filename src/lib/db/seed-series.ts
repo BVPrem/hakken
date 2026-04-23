@@ -43,26 +43,71 @@ function mapAniListToSeries(media: AniListMedia) {
 }
 
 async function seedSeries() {
-  console.log("Starting series seed...");
+  console.log("🌱 Starting expanded series seed...");
 
-  const [trending, currentSeason, topAnime] = await Promise.all([
-    getTrendingAnime(1, 25),
-    getCurrentSeasonAnime(1, 25),
+  // Fetch from multiple AniList sources in parallel
+  // Page 1 + 2 of each category for more coverage
+  const [
+    trending1, trending2,
+    season1,
+    topAnime1, topAnime2, topAnime3,
+    topManga1,
+  ] = await Promise.all([
+    getTrendingAnime(1, 50),
+    getTrendingAnime(2, 50),
+    getCurrentSeasonAnime(1, 50),
     getTopAnime(1, 50),
+    getTopAnime(2, 50),
+    getTopAnime(3, 50),
+    // Manga top rated
+    (async () => {
+      const { searchAniList } = await import("./../../lib/api/anilist");
+      // Get top manga separately via GraphQL
+      const res = await fetch("https://graphql.anilist.co", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: `query {
+            Page(page: 1, perPage: 50) {
+              media(sort: SCORE_DESC, type: MANGA, isAdult: false) {
+                id idMal type
+                title { english romaji native }
+                status description
+                coverImage { extraLarge large }
+                genres tags { name rank isMediaSpoiler }
+                studios { nodes { id name isAnimationStudio } }
+                averageScore popularity seasonYear
+                chapters volumes isAdult
+              }
+            }
+          }`,
+        }),
+      });
+      const json = await res.json();
+      return json.data?.Page?.media ?? [];
+    })(),
   ]);
 
+  // Deduplicate by AniList ID
   const seen = new Set<number>();
-  const all: AniListMedia[] = [];
+  const all: any[] = [];
 
-  for (const item of [...trending, ...currentSeason, ...topAnime]) {
+  for (const item of [
+    ...trending1, ...trending2,
+    ...season1,
+    ...topAnime1, ...topAnime2, ...topAnime3,
+    ...topManga1,
+  ]) {
     if (!seen.has(item.id)) {
       seen.add(item.id);
       all.push(item);
     }
   }
 
-  console.log(`   Fetched ${all.length} unique series from AniList`);
+  console.log(`   Fetched ${all.length} unique series`);
 
+  // Insert in batches — use onConflictDoNothing
+  // so existing series are preserved
   let inserted = 0;
   let skipped = 0;
 
@@ -74,18 +119,40 @@ async function seedSeries() {
         .values(batch)
         .onConflictDoNothing();
       inserted += batch.length;
-      console.log(
-        `   Batch ${Math.floor(i / 10) + 1}: inserted ${batch.length}`
-      );
+      console.log(`   Batch ${Math.floor(i/10)+1}: done`);
     } catch (err) {
       console.error(`   Batch error:`, err);
       skipped += batch.length;
     }
   }
 
-  console.log(`\nSeed complete!`);
-  console.log(`   Inserted: ${inserted}`);
+  console.log(`\n✅ Seed complete!`);
+  console.log(`   Total processed: ${all.length}`);
   console.log(`   Skipped/errors: ${skipped}`);
+
+  // Verification summary
+  try {
+    const { sql } = await import("drizzle-orm");
+    const count = await db.select({ count: sql<number>`COUNT(*)` }).from(series);
+    console.log(`\n📊 Series in DB: ${count[0].count}`);
+
+    const major = await db
+      .select({ titleEn: series.titleEn, titleRomaji: series.titleRomaji })
+      .from(series)
+      .where(
+        sql`LOWER(title_en) LIKE '%dragon ball%' 
+            OR LOWER(title_en) LIKE '%naruto%'
+            OR LOWER(title_en) LIKE '%bleach%'
+            OR LOWER(title_en) LIKE '%one piece%'`
+      );
+    console.log("\n🔍 Major franchises found:");
+    for (const s of major) {
+      console.log(`   • ${s.titleEn ?? s.titleRomaji}`);
+    }
+  } catch (e) {
+    console.warn("   (could not verify count — run manually if needed)");
+  }
+
   process.exit(0);
 }
 
